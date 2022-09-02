@@ -1,0 +1,5 @@
+*.ppm
+*.txt
+*.gdbinit
+build/*
+.vscode/*
