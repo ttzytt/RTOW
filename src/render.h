@@ -56,7 +56,7 @@ color_map out_color_map(const camera& cam, const hittable_list& world,
             usleep(100 * 1000);  // 100 毫秒
         }
     });
-
+    
     for (int th = 1; th <= th_cnt; th++) {
         ths[th] = new thread(
             [&](int sta_line, int th_id) {

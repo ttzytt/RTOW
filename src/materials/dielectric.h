@@ -26,7 +26,7 @@ class dielectric : public material {
         else
             out_dir = refract(unit_dir, rec.norm, ref_ratio);
         out_dir += rand_unit_sphere() * fuzz;
-        ray r_out(rec.hit_pt, out_dir);
+        ray r_out(rec.hit_pt, out_dir, r_in.tm);
         return make_pair(r_out, albedo);
     }
 

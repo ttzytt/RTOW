@@ -1,13 +1,13 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "src/camera.h"
-#include "src/hittables/hittable_list.h"
-#include "src/hittables/sphere.h"
+#include "src/hittable.h"
+#include "src/hittables/hittables.h"
 #include "src/material.h"
 #include "src/materials/materials.h"
-#include "src/rtow.h"
 #include "src/render.h"
+#include "src/rtow.h"
 
 hittable_list rand_scene() {
     hittable_list world;
@@ -24,7 +24,10 @@ hittable_list rand_scene() {
                 if (choose_mat < 0.5) {
                     color albedo = color::rand() * color::rand();
                     sphere_mat = make_shared<lambertian>(albedo);
-
+                    pt3 center_ed = center + pt3(0, rand_f8(0, .5), 0);
+                    world.add(make_shared<moving_sphere>(center, center_ed, 0,
+                                                         1, 0.2, sphere_mat));
+                    continue;
                 } else if (choose_mat < 0.82) {
                     color albedo = color::rand(0.5, 1);
                     f8 fuzz = rand_f8(0, 0.5);
@@ -56,30 +59,33 @@ hittable_list rand_scene() {
 }
 
 int main(int argc, char* argv[]) {
-    if(argc != 2){
+    if (argc != 2) {
         cerr << "usage: <filename>\n";
-    }  
-    
+    }
+
     ofstream outfile;
     outfile.open(argv[1]);
-    
+
     // img
     const f4 asp_ratio = 3.0 / 2.0;
-    const int wid = 2500;
+    const int wid = 500;
     const int hei = round(wid / asp_ratio);
-    const int sample_per_pixel = 500;
+    const int sample_per_pixel = 100;
     const int max_dep = 120;
 
     // cam
-    pt3 lookfrom(13,2,3);
-    pt3 lookat(0,0,0);
-    vec3 vup(0,1,0);
+    pt3 lookfrom(13, 2, 3);
+    pt3 lookat(0, 0, 0);
+    vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
     auto aperture = 0;
 
-    camera cam(lookfrom, lookat, vup, 20, asp_ratio, aperture, dist_to_focus);
+    camera cam(lookfrom, lookat, vup, 20, asp_ratio, aperture, dist_to_focus,
+               0.0, 1.0);
 
     hittable_list world = rand_scene();
 
-    render::out_ppm(render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep), outfile);
+    render::out_ppm(
+        render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep),
+        outfile);
 }

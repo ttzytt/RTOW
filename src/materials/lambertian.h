@@ -14,7 +14,7 @@ class lambertian : public material {
         if(ref_dir.near_zero()) // 如果 rand_unit_vec() 等于 -rec.norm 
             ref_dir = rec.norm;
 
-        ray ref_ray(rec.hit_pt, ref_dir);
+        ray ref_ray(rec.hit_pt, ref_dir, r_in.tm);
         return make_pair(ref_ray, albedo);    
     }
     color albedo;  // 反射率

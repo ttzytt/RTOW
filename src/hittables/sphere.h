@@ -10,8 +10,8 @@ using namespace std;
 class sphere : public hittable {
    public:
     sphere() {}
-    sphere(pt3 cent, f8 r, shared_ptr<material> m)
-        : center(cent), radius(r), mat_ptr(m){};
+    sphere(const pt3 &cent, f8 rad, shared_ptr<material> mat)
+        : center(cent), radius(rad), mat_ptr(mat){};
 
     virtual optional<hit_rec> hit(const ray& r, f8 t_min,
                                   f8 t_max) const override;
