@@ -3,6 +3,8 @@
 
 class camera {
    public:
+    camera() = default;
+
     camera(vec3 lookfrom, vec3 lookat, vec3 vup = vec3(0, 1, 0), f8 vfov = 90,
            f8 asp_ratio = 16.0 / 9.0, f8 aperture = 0, f8 foc_len = 1,
            f8 _t_open = 0, f8 _t_close = 0) {

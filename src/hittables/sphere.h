@@ -9,12 +9,14 @@ using namespace std;
 
 class sphere : public hittable {
    public:
-    sphere() {}
+    sphere() = default;
     sphere(const pt3 &cent, f8 rad, shared_ptr<material> mat)
         : center(cent), radius(rad), mat_ptr(mat){};
 
     virtual optional<hit_rec> hit(const ray& r, f8 t_min,
                                   f8 t_max) const override;
+
+    virtual optional<aabb> bounding_box(f8 tm0, f8 tm1) const override;    
 
     // optional<hit_rec> hit2(const ray& r, f8 t_min, f8 t_max) const;
     pt3 center;
@@ -47,6 +49,13 @@ optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
     rec.mat_ptr = mat_ptr;
 
     return rec;
+}
+
+optional<aabb> sphere::bounding_box(f8 tm0, f8 tm1) const {
+    return aabb(
+        center - vec3(radius, radius, radius),
+        center + vec3(radius, radius, radius)
+    );
 }
 
 // optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const {

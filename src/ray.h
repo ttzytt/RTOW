@@ -3,7 +3,7 @@
 
 class ray {
    public:
-    ray(){}
+    ray() = default;
     ray(const pt3& _orig, const vec3& _dir, const f8& _tm) : orig(_orig), dir(_dir), tm(_tm) {}
 
     pt3 at(double dis) const {

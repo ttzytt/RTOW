@@ -31,6 +31,8 @@ class vec3 {
 
     vec3 &operator/=(const f8 t) { return *this *= 1 / t; }
 
+    vec3 operator <=> (const vec3 &v) const = default;
+
     f8 len() const { return sqrt(len_sq()); }
 
     f8 len_sq() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
@@ -63,6 +65,9 @@ using namespace std;
 inline ostream &operator<<(ostream &out, const vec3 &v) {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
 }
+
+
+// 基本运算
 
 inline vec3 operator+(const vec3 &u, const vec3 &v) {
     return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
@@ -100,6 +105,8 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 inline vec3 vec3::unit_vec() const { return *this / this->len(); }
 inline vec3 unit_vec(const vec3 &v) { return v.unit_vec(); }
 
+// 随机生成函数
+
 inline vec3 rand_unit_sphere() {
     // 圆心为 (0, 0)
     while (true) {
@@ -127,6 +134,8 @@ inline vec3 rand_unit_disk(){
         return tmp;
     }    
 }
+
+// 光学相关
 
 inline vec3 vec3::reflect(const vec3 &norm) const {
     // norm 是单位向量
