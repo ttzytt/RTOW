@@ -5,7 +5,6 @@
 #include "../vec3.h"
 #pragma once
 
-  std;
 
 class sphere : public hittable {
    public:
@@ -13,10 +12,10 @@ class sphere : public hittable {
     sphere(const pt3 &cent, f8 rad, shared_ptr<material> mat)
         : center(cent), radius(rad), mat_ptr(mat){};
 
-    virtual optional<hit_rec> hit(const ray& r, f8 t_min,
+    virtual std::optional<hit_rec> hit(const ray& r, f8 t_min,
                                   f8 t_max) const override;
 
-    virtual optional<aabb> bounding_box(f8 tm0, f8 tm1) const override;    
+    virtual std::optional<aabb> bounding_box(f8 tm0, f8 tm1) const override;    
 
     // optional<hit_rec> hit2(const ray& r, f8 t_min, f8 t_max) const;
     pt3 center;
@@ -24,7 +23,7 @@ class sphere : public hittable {
     shared_ptr<material> mat_ptr;
 };
 
-optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
+std::optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
     vec3 oc = r.orig - center;  // 圆心和光线起点的差
     f8 a = dot(r.dir, r.dir);   // 系数
     f8 b = 2.0 * dot(oc, r.dir);
@@ -32,13 +31,13 @@ optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
     f8 discriminant = b * b - 4 * a * c;
 
     if (discriminant < 0) {
-        return nullopt;
+        return std::nullopt;
     }
 
     f8 t_root = (-b - sqrt(discriminant)) / (2 * a);
     if (t_root < t_min || t_max < t_root) {
         t_root = ((-b + sqrt(discriminant)) / (2 * a));
-        if (t_root < t_min || t_max < t_root) return nullopt;
+        if (t_root < t_min || t_max < t_root) return std::nullopt;
     }
 
     hit_rec rec;
@@ -51,7 +50,7 @@ optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
     return rec;
 }
 
-optional<aabb> sphere::bounding_box(f8 tm0, f8 tm1) const {
+std::optional<aabb> sphere::bounding_box(f8 tm0, f8 tm1) const {
     return aabb(
         center - vec3(radius, radius, radius),
         center + vec3(radius, radius, radius)

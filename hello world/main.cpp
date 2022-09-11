@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "dbg.h"
-  std;
+
 
 int main() {
     // freopen("./hello world.ppm", "w", stdout);

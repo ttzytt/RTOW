@@ -9,6 +9,8 @@
 #include "src/render.h"
 #include "src/rtow.h"
 
+using namespace std;
+
 hittable_list rand_scene() {
     hittable_list world;
     auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));

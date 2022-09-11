@@ -17,6 +17,7 @@
 #include <immintrin.h>
 
 #include <cmath>
+#include <compare>
 #include <iostream>
 
 using f8 = double;
@@ -49,7 +50,7 @@ class vec3 {
 
     vec3 &operator/=(const f8 t) { return *this *= 1 / t; }
 
-    int operator<=>(const vec3 &v) const = default;
+    std::partial_ordering operator<=>(const vec3 &) const = default;
 
     f8 len() const { return sqrt(len_sq()); }
 
@@ -79,7 +80,7 @@ class vec3 {
 
 // vec3 utils
 
-inline std::ostream &std::operator<<(std::ostream &out, const vec3 &v) {
+inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
@@ -277,8 +278,8 @@ inline vec3 operator*(const vec3 &v, f8 t) { return t * v; }
 
 inline vec3 operator/(vec3 v, f8 t) { return (1 / t) * v; }
 
-inline f8 dot(const vec3& u, const vec3 &v){
-    vec3&& tmp = u * v;
+inline f8 dot(const vec3 &u, const vec3 &v) {
+    vec3 &&tmp = u * v;
     return tmp[0] + tmp[1] + tmp[2];
 }
 
@@ -317,12 +318,16 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
     dst[MAX:256] := 0
      */
 
-    __m256d t1 = _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(1, 2, 0, 3));
-    __m256d t2 = _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(2, 0, 1, 3));
+    __m256d t1 =
+        _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(1, 2, 0, 3));
+    __m256d t2 =
+        _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(2, 0, 1, 3));
     __m256d t3 = _mm256_mul_pd(t1, t2);
 
-    __m256d k1 = _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(2, 0, 1, 3));
-    __m256d k2 = _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(1, 2, 0, 3));
+    __m256d k1 =
+        _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(2, 0, 1, 3));
+    __m256d k2 =
+        _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(1, 2, 0, 3));
     __m256d k3 = _mm256_mul_pd(t1, t2);
 
     return _mm256_sub_pd(t3, k3);
@@ -341,7 +346,7 @@ inline vec3 rand_unit_vec() {
     f8 angle = rand_f8(0, 2 * pi);
     f8 z = rand_f8(-1, 1);
 
-    f8 r = sqrt(1 - z * z);  
+    f8 r = sqrt(1 - z * z);
     return vec3(r * cos(angle), r * sin(angle), z);
 }
 

@@ -1,14 +1,13 @@
 #include "../material.h"
 #include "../rtow.h"
 #pragma once
-  std;
 
 class dielectric : public material {
    public:
     dielectric(f8 ref, const color& alb = color(1, 1, 1), f8 fuz = 0)
         : ref_idx(ref), albedo(alb), fuzz(fuz) {}
 
-    virtual optional<pair<ray, color>> get_ray_out(
+    virtual std::optional<std::pair<ray, color>> get_ray_out(
         const ray& r_in, const hit_rec& rec) const override {
         f8 ref_ratio = rec.front_face ? (1.0 / ref_idx) : ref_idx;
         // 光线从空气进入玻璃球还是玻璃球进入空气？
@@ -27,7 +26,7 @@ class dielectric : public material {
             out_dir = refract(unit_dir, rec.norm, ref_ratio);
         out_dir += rand_unit_sphere() * fuzz;
         ray r_out(rec.hit_pt, out_dir, r_in.tm);
-        return make_pair(r_out, albedo);
+        return std::make_pair(r_out, albedo);
     }
 
     f8 ref_idx, fuzz;  // 折射率
