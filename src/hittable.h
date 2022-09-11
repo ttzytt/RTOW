@@ -14,8 +14,10 @@ struct hit_rec {
     vec3 hit_pt;  // 击中的点
     vec3 norm;    // 击中后反射的朝向
     f8 t;         // 解出来的 t
-    bool front_face;
+    f8 hori, verti;  // 球面上的坐标，使用极角和方位角算出来
+    bool front_face; // 从物体的内部射入还是外部
     shared_ptr<material> mat_ptr;
+
     inline void set_face_normal(const ray& r, const vec3& outward_norm) {
         front_face =
             dot(r.dir, outward_norm) < 0;  // 小于 0 说明是从外部击中物体的
