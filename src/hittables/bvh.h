@@ -4,7 +4,7 @@
 #include "functional"
 #include "hittables.h"
 
-using namespace std;
+  std;
 
 // bouding box hierarchy
 
@@ -54,7 +54,7 @@ bvh_node::bvh_node(vector<shared_ptr<hittable>> objs, int beg, int ed, f8 tm0,
                    f8 tm1) {
     // 包括 beg，不包括 ed
     int axis = rand_i4(0, 2);  // [0, 2]
-    using namespace placeholders;
+      placeholders;
     auto comparator = bind(box_compare, _1, _2, axis);
     int obj_cnt = ed - beg;
 

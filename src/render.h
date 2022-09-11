@@ -11,10 +11,10 @@
 #include "rtow.h"
 #include "tqdm.h"
 
-using namespace std;
-using color_map = vector<vector<color>>;
+using color_map = std::vector<std::vector<color>>;
 
 // class render {
+
 namespace render {
 color ray_color(const ray& r, const hittable& world, int dep_left) {
     if (dep_left <= 0) return color(0, 0, 0);
@@ -38,8 +38,8 @@ color ray_color(const ray& r, const hittable& world, int dep_left) {
 color_map out_color_map(const camera& cam, const hittable_list& world,
                         int wid = 300, int hei = 200, int sample_per_pix = 500,
                         int max_dep = 130,
-                        int th_cnt = thread::hardware_concurrency()) {
-    atomic<int> line_completed = 0;
+                        int th_cnt = std::thread::hardware_concurrency()) {
+    std::atomic<int> line_completed = 0;
     int per_th = (hei + th_cnt - 1) / th_cnt;
     int hei_left = hei;
     color_map mp;
@@ -47,10 +47,10 @@ color_map out_color_map(const camera& cam, const hittable_list& world,
     for (int i = 0; i < hei; i++) {
         mp[i].resize(wid);
     }
-    thread* ths[th_cnt];
+    std::thread* ths[th_cnt];
     tqdm pbar;
 
-    thread bar_checker([&]() { // 检查进度
+    std::thread bar_checker([&]() { // 检查进度
         while (line_completed < hei) {
             pbar.progress(line_completed, hei);
             usleep(100 * 1000);  // 100 毫秒
@@ -58,9 +58,9 @@ color_map out_color_map(const camera& cam, const hittable_list& world,
     });
     
     for (int th = 1; th <= th_cnt; th++) {
-        ths[th] = new thread(
+        ths[th] = new std::thread(
             [&](int sta_line, int th_id) {
-                for (int j = sta_line - 1; j >= max(sta_line - per_th, 0);
+                for (int j = sta_line - 1; j >= std::max(sta_line - per_th, 0);
                      j--) {
                     for (int i = 0; i < wid; i++) {
                         color pixel(0, 0, 0);
@@ -88,7 +88,7 @@ color_map out_color_map(const camera& cam, const hittable_list& world,
     return mp;
 }
 
-void out_ppm(const color_map& mp, ostream& out) {
+void out_ppm(const color_map& mp, std::ostream& out) {
     out << "P3\n" << mp[0].size() << ' ' << mp.size() << "\n255\n";
     // 长宽
     for (int i = mp.size() - 1; i >= 0; i--) {

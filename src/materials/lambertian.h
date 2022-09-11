@@ -1,7 +1,7 @@
 #include "../material.h"
 #include "../rtow.h"
 #pragma once
-using namespace std;
+  std;
 
 class lambertian : public material {
    public:

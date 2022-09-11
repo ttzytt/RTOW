@@ -7,7 +7,7 @@
 #include "sphere.h"
 
 class moving_sphere;
-using namespace std;
+  std;
 
 auto linear_mov = [](f8 x) { return x; };
 // 输入 0 ~ 1，代表当前时间是运动总时间的百分之多少

@@ -78,9 +78,8 @@ class vec3 {
 };
 
 // vec3 utils
-using namespace std;
 
-inline ostream &operator<<(ostream &out, const vec3 &v) {
+inline std::ostream &std::operator<<(std::ostream &out, const vec3 &v) {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
@@ -250,7 +249,7 @@ class vec3 {
     __m256d vec_data;
 };
 
-inline ostream &operator<<(ostream &out, const vec3 &v) {
+inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
@@ -342,9 +341,7 @@ inline vec3 rand_unit_vec() {
     f8 angle = rand_f8(0, 2 * pi);
     f8 z = rand_f8(-1, 1);
 
-    f8 r = sqrt(1 - z * z);  // sqrt(x*x + y*y + z*z) = r;
-    // 一个 z 轴确定的圆的半径
-    // x^2 + y^2 = 1 - z^2
+    f8 r = sqrt(1 - z * z);  
     return vec3(r * cos(angle), r * sin(angle), z);
 }
 
@@ -377,3 +374,5 @@ using pt3 = vec3;
 using color = vec3;
 
 }  // namespace avx2
+
+// TODO: 之后替换成一个类，avx 继承自这个类？

@@ -5,7 +5,7 @@
 #include "../aabb.h"
 
 #pragma once
-using namespace std;
+  std;
 
 class hittable_list : public hittable {
    public:

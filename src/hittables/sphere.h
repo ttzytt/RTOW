@@ -5,7 +5,7 @@
 #include "../vec3.h"
 #pragma once
 
-using namespace std;
+  std;
 
 class sphere : public hittable {
    public:

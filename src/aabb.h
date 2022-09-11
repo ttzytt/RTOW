@@ -2,7 +2,6 @@
 #include <cmath>
 
 #include "rtow.h"
-using namespace std;
 
 // axis-aligned bounding boxes
 class aabb {
@@ -19,10 +18,10 @@ class aabb {
             // 应该先穿过 t0
             f8 t1 = (mx[dim] - r.orig[dim]) * invD;
 
-            if (invD < 0.0) swap(t0, t1);  // 如果光线是反方向来的
+            if (invD < 0.0) std::swap(t0, t1);  // 如果光线是反方向来的
 
-            tmin = max(tmin, t0);  // x, y, z 轴中最大的 tmin
-            tmax = min(tmax, t1);
+            tmin = std::max(tmin, t0);  // x, y, z 轴中最大的 tmin
+            tmax = std::min(tmax, t1);
 
             // 如果碰到 tmin 之前先碰到 tmax
 
@@ -37,11 +36,11 @@ class aabb {
 };
 
 aabb surrounding_box(aabb b1, aabb b2) {
-    pt3 mn(min(b1.mn[0], b2.mn[0]), min(b1.mn[1], b2.mn[1]),
-           min(b1.mn[2], b2.mn[2]));
+    pt3 mn(std::min(b1.mn[0], b2.mn[0]), std::min(b1.mn[1], b2.mn[1]),
+           std::min(b1.mn[2], b2.mn[2]));
 
-    pt3 mx(max(b1.mx[0], b2.mx[0]), max(b1.mx[1], b2.mx[1]),
-           max(b1.mx[2], b2.mx[2]));
+    pt3 mx(std::max(b1.mx[0], b2.mx[0]), std::max(b1.mx[1], b2.mx[1]),
+           std::max(b1.mx[2], b2.mx[2]));
 
     return aabb(mn, mx);
 }

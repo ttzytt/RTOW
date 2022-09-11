@@ -7,7 +7,7 @@
 #include "../src/vec3.h"
 #include "dbg.h"
 
-using namespace std;
+  std;
 
 int main() {
     // freopen("./hello world.ppm", "w", stdout);
