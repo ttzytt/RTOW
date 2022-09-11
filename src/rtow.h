@@ -48,6 +48,14 @@ inline f8 rand_f8(f8 mn, f8 mx){
     return mn + (mx - mn) * rand_f8();
 }
 
+inline i8 rand_i8(i8 mn, f8 mx){
+    return rand_f8(mn, mx + 1);
+}
+
+inline i4 rand_i4(i4 mn, i4 mx){
+    return rand_i8(mn, mx);
+}
+
 inline f8 clamp(f8 x, f8 mn, f8 mx){
     if(x < mn) return mn;
     if(x > mx) return mx;
