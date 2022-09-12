@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "rtow.h"
-#include "vec3.h"
 
 inline color gamma_correct(const color& pixel, f8 gamma_val) {
     return color(powf64(pixel[0], 1.0 / gamma_val), powf64(pixel[1], 1.0 / gamma_val),

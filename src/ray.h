@@ -1,5 +1,5 @@
 #pragma once
-#include "vec3.h"
+#include "rtow.h"
 
 class ray {
    public:

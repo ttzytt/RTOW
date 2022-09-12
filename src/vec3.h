@@ -13,15 +13,16 @@
 #pragma GCC target( \
     "sse,sse2,sse3,ssse3,sse4.1,sse4.2,avx,avx2,popcnt,tune=native")
 
-#include <emmintrin.h>
+
 #include <immintrin.h>
+#include <emmintrin.h>
 
 #include <cmath>
 #include <compare>
 #include <iostream>
 
 using f8 = double;
-
+namespace navx2 {
 class vec3 {
    public:
     vec3() : e{0, 0, 0} {}
@@ -50,7 +51,7 @@ class vec3 {
 
     vec3 &operator/=(const f8 t) { return *this *= 1 / t; }
 
-    std::partial_ordering operator<=>(const vec3 &) const = default;
+    auto operator<=>(const vec3 &) const = default;
 
     f8 len() const { return sqrt(len_sq()); }
 
@@ -186,6 +187,9 @@ vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
 
 using pt3 = vec3;
 using color = vec3;  // 和 typedef 等价
+}  // namespace navx2
+
+//--------------------------------------------- avx2
 
 namespace avx2 {
 class vec3 {
@@ -195,13 +199,26 @@ class vec3 {
 
     vec3(const __m256d &_vec_data) : vec_data(_vec_data) {}
 
-    vec3() { vec_data = _mm256_setzero_pd(); }
+    vec3():vec_data(_mm256_setzero_pd()) {}
 
     inline f8 operator[](int i) const { return vec_data[i]; }
+    inline f8 x() const { return (*this)[0]; }
+    inline f8 y() const { return (*this)[1]; }
+    inline f8 z() const { return (*this)[2]; }
 
     inline vec3 operator-() const {
         return _mm256_sub_pd(_mm256_setzero_pd(), vec_data);
         // 0 - vec_data
+    }
+
+    inline vec3 &operator+=(const vec3 &v){
+        vec_data = _mm256_add_pd(vec_data, v.vec_data);
+        return *this;
+    }
+
+    inline vec3 &operator-=(const vec3 &v){
+        vec_data = _mm256_sub_pd(vec_data, v.vec_data);
+        return *this;
     }
 
     inline vec3 &operator*=(const vec3 &v) {
@@ -247,7 +264,7 @@ class vec3 {
     inline vec3 refract(const vec3 &norm, f8 etain_over_out) const;
 
    public:
-    __m256d vec_data;
+    __m256d vec_data __attribute__((aligned(32)));
 };
 
 inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
@@ -283,7 +300,8 @@ inline f8 dot(const vec3 &u, const vec3 &v) {
     return tmp[0] + tmp[1] + tmp[2];
 }
 
-inline int shuf_control_rev(char p0, char p1, char p2, char p3) {
+consteval int shuf_control_rev(const char p0, const char p1, const char p2, const char p3) {
+    // 编译期计算
     // 重排序之后，dst 的第 i 位是 src 的 pi
     return p0 || (p1 << 2) || (p2 << 4) || (p3 << 6);
 }
@@ -332,6 +350,9 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
     return _mm256_sub_pd(t3, k3);
 }
+
+inline vec3 vec3::unit_vec() const { return *this / this->len(); }
+inline vec3 unit_vec(const vec3 &v) { return v.unit_vec(); }
 
 inline vec3 rand_unit_sphere() {
     // 圆心为 (0, 0)
