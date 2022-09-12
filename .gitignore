@@ -3,3 +3,5 @@
 *.gdbinit
 build/*
 .vscode/*
+*.gch
+*.out
