@@ -13,15 +13,15 @@
 #pragma GCC target( \
     "sse,sse2,sse3,ssse3,sse4.1,sse4.2,avx,avx2,popcnt,tune=native")
 
-
-#include <immintrin.h>
 #include <emmintrin.h>
+#include <immintrin.h>
 
 #include <cmath>
 #include <compare>
 #include <iostream>
 
 using f8 = double;
+
 namespace navx2 {
 class vec3 {
    public:
@@ -199,7 +199,9 @@ class vec3 {
 
     vec3(const __m256d &_vec_data) : vec_data(_vec_data) {}
 
-    vec3():vec_data(_mm256_setzero_pd()) {}
+    vec3() : vec_data(_mm256_setzero_pd()) {}
+
+    vec3(const navx2::vec3 &v) : vec_data(_mm256_set_pd(0, v[2], v[1], v[0])) {}
 
     inline f8 operator[](int i) const { return vec_data[i]; }
     inline f8 x() const { return (*this)[0]; }
@@ -211,12 +213,12 @@ class vec3 {
         // 0 - vec_data
     }
 
-    inline vec3 &operator+=(const vec3 &v){
+    inline vec3 &operator+=(const vec3 &v) {
         vec_data = _mm256_add_pd(vec_data, v.vec_data);
         return *this;
     }
 
-    inline vec3 &operator-=(const vec3 &v){
+    inline vec3 &operator-=(const vec3 &v) {
         vec_data = _mm256_sub_pd(vec_data, v.vec_data);
         return *this;
     }
@@ -272,11 +274,11 @@ inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
 }
 
 inline vec3 operator+(const vec3 &u, const vec3 &v) {
-    return _mm256_add_pd(u.vec_data, v.vec_data);
+    return vec3(_mm256_add_pd(u.vec_data, v.vec_data));
 }
 
 inline vec3 operator-(const vec3 &u, const vec3 &v) {
-    return _mm256_sub_pd(u.vec_data, v.vec_data);
+    return vec3(_mm256_sub_pd(u.vec_data, v.vec_data));
 }
 
 inline vec3 operator*(const vec3 &u, const vec3 &v) {
@@ -300,10 +302,13 @@ inline f8 dot(const vec3 &u, const vec3 &v) {
     return tmp[0] + tmp[1] + tmp[2];
 }
 
-consteval int shuf_control_rev(const char p0, const char p1, const char p2, const char p3) {
+consteval unsigned short shuf_control_rev(const unsigned char p0,
+                                          const unsigned char p1,
+                                          const unsigned char p2,
+                                          const unsigned char p3) {
     // 编译期计算
-    // 重排序之后，dst 的第 i 位是 src 的 pi
-    return p0 || (p1 << 2) || (p2 << 4) || (p3 << 6);
+    // 重排序之后，src 的第 i 位放到 dst 的第 pi 位
+    return (p0 | (p1 << 2) | (p2 << 4) | (p3 << 6));
 }
 
 inline vec3 cross(const vec3 &u, const vec3 &v) {
@@ -335,9 +340,13 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
     dst[255:192] := SELECT4(a[255:0], imm8[7:6])
     dst[MAX:256] := 0
      */
+    _MM_SHUFFLE(1, 2, 3, 4);
 
     __m256d t1 =
         _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(1, 2, 0, 3));
+    // __m256d t1 =
+    //    _mm256_permute4x64_pd(u.vec_data, _MM_SHUFFLE(3, 0, 2, 1));
+
     __m256d t2 =
         _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(2, 0, 1, 3));
     __m256d t3 = _mm256_mul_pd(t1, t2);
@@ -346,7 +355,7 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
         _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(2, 0, 1, 3));
     __m256d k2 =
         _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(1, 2, 0, 3));
-    __m256d k3 = _mm256_mul_pd(t1, t2);
+    __m256d k3 = _mm256_mul_pd(k1, k2);
 
     return _mm256_sub_pd(t3, k3);
 }
@@ -382,7 +391,6 @@ inline vec3 rand_unit_disk() {
 inline vec3 vec3::reflect(const vec3 &norm) const {
     return *this - 2 * dot(*this, norm) * norm;
 }
-
 inline vec3 reflect(const vec3 &v, const vec3 &n) { return v.reflect(n); }
 
 inline vec3 vec3::refract(const vec3 &norm, f8 etain_overout) const {
