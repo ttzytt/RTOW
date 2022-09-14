@@ -1,10 +1,9 @@
 #include <fstream>
 #include <iostream>
-
+#define DBG_MACRO_DISABLE 
+#include <dbg.h>
 #include "src/camera.h"
-#include "src/hittable.h"
 #include "src/hittables/hittables.h"
-#include "src/material.h"
 #include "src/materials/materials.h"
 #include "src/render.h"
 #include "src/rtow.h"
@@ -13,8 +12,11 @@ using namespace std;
 
 hittable_list rand_scene() {
     hittable_list world;
-    auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000, ground_material));
+    // auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
+    // world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000, ground_material));
+
+    auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    world.add(make_shared<sphere>(pt3(0,-1000,0), 1000, make_shared<lambertian>(checker)));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -70,7 +72,7 @@ int main(int argc, char* argv[]) {
 
     // img
     const f4 asp_ratio = 3.0 / 2.0;
-    const int wid = 500;
+    const int wid = 300;
     const int hei = round(wid / asp_ratio);
     const int sample_per_pixel = 100;
     const int max_dep = 120;

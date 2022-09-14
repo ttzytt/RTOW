@@ -1,11 +1,15 @@
 #include "../material.h"
+#include "../textures/textures.h"
 #include "../rtow.h"
+#include <memory>
 #pragma once
 
 class lambertian : public material {
    public:
-    lambertian(const color& alb) : albedo(alb) {}
     
+    lambertian(const color& alb) : albedo(std::make_shared<fixed_color>(alb)) {}
+    lambertian(std::shared_ptr<texture> text) : albedo(text) {}
+
     virtual std::optional<std::pair<ray, color>> 
     get_ray_out(const ray& r_in, const hit_rec& rec) const override {
         vec3 ref_dir = rec.norm + rand_unit_vec();
@@ -14,7 +18,10 @@ class lambertian : public material {
             ref_dir = rec.norm;
 
         ray ref_ray(rec.hit_pt, ref_dir, r_in.tm);
-        return std::make_pair(ref_ray, albedo);    
+        
+        color &&attenue = albedo->value(rec.polar, rec.azim, rec.hit_pt);
+
+        return std::make_pair(ref_ray, attenue);    
     }
-    color albedo;  // 反射率
+    std::shared_ptr<texture> albedo;  // 材质不同位置的反射率不同
 };

@@ -5,13 +5,14 @@
 #include "ray.h"
 #include "rtow.h"
 
-// 防止不同文件内传递
 class material;
 struct hit_rec {
     vec3 hit_pt;      // 击中的点
     vec3 norm;        // 击中后反射的朝向
     f8 t;             // 解出来的 t
-    f8 hori, verti;   // 球面上的坐标，使用极角和方位角算出来
+    f8 polar, azim;   // 击中点坐标算出来的极角和方位角
+                      // 方位角的取值范围是 360 度，极角的取值范围是 180
+                      // 180 是因为方位角可以转到反方向
     bool front_face;  // 从物体的内部射入还是外部
     shared_ptr<material> mat_ptr;
 

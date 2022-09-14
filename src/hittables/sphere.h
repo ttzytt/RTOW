@@ -1,21 +1,36 @@
 #include <optional>
+#include <utility>
 
 #include "../hittable.h"
 #include "../rtow.h"
 #include "../vec3.h"
-#pragma once
 
+#pragma once
 
 class sphere : public hittable {
    public:
     sphere() = default;
-    sphere(const pt3 &cent, f8 rad, shared_ptr<material> mat)
+    sphere(const pt3& cent, f8 rad, shared_ptr<material> mat)
         : center(cent), radius(rad), mat_ptr(mat){};
 
     virtual std::optional<hit_rec> hit(const ray& r, f8 t_min,
-                                  f8 t_max) const override;
+                                       f8 t_max) const override;
 
-    virtual std::optional<aabb> bounding_box(f8 tm0, f8 tm1) const override;    
+    virtual std::optional<aabb> bounding_box(f8 tm0, f8 tm1) const override;
+
+    static std::pair<f8, f8> get_polar_azim(const pt3& p) {
+        // p: a given point on the sphere of radius one, centered at the origin.
+        // u (polar): returned value [0,1] of angle around the Y axis from X=-1.
+        // v: (azim) returned value [0,1] of angle from Y=-1 to Y=+1.
+        //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
+        //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
+        //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
+
+        f8 polar_rad = acos(-p.y());              // pi
+        f8 azim_rad = atan2(-p.z(), p.x()) + pi;  // +- pi
+
+        return {polar_rad / pi, azim_rad / (pi * 2.0)};
+    };
 
     // optional<hit_rec> hit2(const ray& r, f8 t_min, f8 t_max) const;
     pt3 center;
@@ -23,7 +38,7 @@ class sphere : public hittable {
     shared_ptr<material> mat_ptr;
 };
 
-std::optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
+std::optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const {
     vec3 oc = r.orig - center;  // 圆心和光线起点的差
     f8 a = dot(r.dir, r.dir);   // 系数
     f8 b = 2.0 * dot(oc, r.dir);
@@ -46,15 +61,13 @@ std::optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const  {
     vec3 outward_norm = (rec.hit_pt - center) / radius;  // 确保单位长度
     rec.set_face_normal(r, outward_norm);
     rec.mat_ptr = mat_ptr;
-
+    std::tie(rec.polar, rec.azim) = get_polar_azim(outward_norm);
     return rec;
 }
 
 std::optional<aabb> sphere::bounding_box(f8 tm0, f8 tm1) const {
-    return aabb(
-        center - vec3(radius, radius, radius),
-        center + vec3(radius, radius, radius)
-    );
+    return aabb(center - vec3(radius, radius, radius),
+                center + vec3(radius, radius, radius));
 }
 
 // optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const {

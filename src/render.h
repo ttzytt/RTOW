@@ -3,6 +3,7 @@
 #include <atomic>
 #include <optional>
 #include <thread>
+#include <list>
 
 #include "camera.h"
 #include "hittable.h"
@@ -16,8 +17,13 @@ using color_map = std::vector<std::vector<color>>;
 // class render {
 
 namespace render {
+struct block2rend{
+    std::pair<int, int> row_range;
+    std::pair<int, int> col_range; // inclusive 
+};
+
 color ray_color(const ray& r, const hittable& world, int dep_left) {
-    if (dep_left <= 0) return color(0, 0, 0);
+    if (dep_left <= 0) return color();
 
     auto&& rec = world.hit(r, 0.00001, infinity);
     if (rec.has_value()) {
@@ -27,12 +33,16 @@ color ray_color(const ray& r, const hittable& world, int dep_left) {
 
             return attenua * ray_color(r_ref, world, dep_left - 1);
         }
-        return color(0, 0, 0);
+        return color(); // 0, 0, 0
     }
     vec3 unit_dir = unit_vec(r.dir);  // r.dir 是屏幕上的点
     f8 t = 0.5 * (unit_dir.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.8, 1.0);
     // 蓝白渐变的背景
+}
+
+std::list<block2rend> img2blocks(int wid, int hei, std::pair<int, int> target_size){
+    
 }
 
 color_map out_color_map(const camera& cam, const hittable_list& world,

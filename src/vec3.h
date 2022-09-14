@@ -340,22 +340,18 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
     dst[255:192] := SELECT4(a[255:0], imm8[7:6])
     dst[MAX:256] := 0
      */
-    _MM_SHUFFLE(1, 2, 3, 4);
 
-    __m256d t1 =
+    __m256d &&t1 =
         _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(1, 2, 0, 3));
-    // __m256d t1 =
-    //    _mm256_permute4x64_pd(u.vec_data, _MM_SHUFFLE(3, 0, 2, 1));
-
-    __m256d t2 =
+    __m256d &&t2 =
         _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(2, 0, 1, 3));
-    __m256d t3 = _mm256_mul_pd(t1, t2);
+    __m256d &&t3 = _mm256_mul_pd(t1, t2);
 
-    __m256d k1 =
+    __m256d &&k1 =
         _mm256_permute4x64_pd(u.vec_data, shuf_control_rev(2, 0, 1, 3));
-    __m256d k2 =
+    __m256d &&k2 =
         _mm256_permute4x64_pd(v.vec_data, shuf_control_rev(1, 2, 0, 3));
-    __m256d k3 = _mm256_mul_pd(k1, k2);
+    __m256d &&k3 = _mm256_mul_pd(k1, k2);
 
     return _mm256_sub_pd(t3, k3);
 }
