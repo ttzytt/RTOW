@@ -10,7 +10,7 @@
 #include "hittables/hittable_list.h"
 #include "material.h"
 #include "rtow.h"
-#include "tqdm.h"
+#include "externals/tqdm.h"
 
 using color_map = std::vector<std::vector<color>>;
 

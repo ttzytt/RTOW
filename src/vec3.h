@@ -22,6 +22,11 @@
 
 using f8 = double;
 
+inline f8 rand_f8();
+inline f8 rand_f8(f8 mn, f8 mx);
+inline i8 rand_i8(i8 mn, f8 mx);
+inline i4 rand_i4(i4 mn, i4 mx);
+
 namespace navx2 {
 class vec3 {
    public:
@@ -358,31 +363,6 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 vec3::unit_vec() const { return *this / this->len(); }
 inline vec3 unit_vec(const vec3 &v) { return v.unit_vec(); }
-
-inline vec3 rand_unit_sphere() {
-    // 圆心为 (0, 0)
-    while (true) {
-        vec3 pt = vec3::rand(-1, 1);
-        if (pt.len_sq() >= 1) continue;
-        return pt;
-    }
-}
-
-inline vec3 rand_unit_vec() {
-    f8 angle = rand_f8(0, 2 * pi);
-    f8 z = rand_f8(-1, 1);
-
-    f8 r = sqrt(1 - z * z);
-    return vec3(r * cos(angle), r * sin(angle), z);
-}
-
-inline vec3 rand_unit_disk() {
-    while (true) {
-        vec3 tmp(rand_f8(-1, 1), rand_f8(-1, 1), 0);
-        if (tmp.len_sq() >= 1) continue;
-        return tmp;
-    }
-}
 
 inline vec3 vec3::reflect(const vec3 &norm) const {
     return *this - 2 * dot(*this, norm) * norm;
