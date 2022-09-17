@@ -14,7 +14,7 @@ std::array<f8, SIZ> rand_f8s_initializer() {
     return ret;
 }
 
-template <int SIZ>
+template <int SIZ> 
 // SIZ 开越大，灰度更多
 // 但是 SIZ 必须是 2^x，要不然 & (SIZ - 1) 时就会损失很多精度 
 class perlin {
@@ -29,14 +29,16 @@ class perlin {
         std::shuffle(z_perm.begin(), z_perm.end(), generator);
     }
     
-    f8 noise(const pt3& p) const {
+    inline f8 noise(const pt3& p) const {
         const f8 coeff = 1 / square_sz;
         int i = int(coeff * (p.x())) & (SIZ - 1);
         // coeff 越大，就能越快的经过 int 转换后变成另一个数字
         int j = int(coeff * (p.y())) & (SIZ - 1);
         int k = int(coeff * (p.z())) & (SIZ - 1);
-        return rand_f8s[x_perm[i] ^ y_perm[j] ^ z_perm[k]];
+        return rand_f8s[x_perm[i] ^ y_perm[j] ^ z_perm[k]]; // 不进位加法
     }
+
+
 
     std::array<int, SIZ> x_perm, y_perm, z_perm;
     inline static std::array<f8, SIZ>&& rand_f8s = rand_f8s_initializer<SIZ>(); // 如果是静态变量会多次初始化？

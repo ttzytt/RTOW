@@ -19,6 +19,7 @@
 #include <cmath>
 #include <compare>
 #include <iostream>
+#include <tuple>
 
 using f8 = double;
 
@@ -189,6 +190,34 @@ inline vec3 vec3::refract(const vec3 &norm, f8 etain_overout) const {
 vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
     return uv.refract(n, etai_over_etat);
 }
+
+vec3 lerp(const vec3 &a, const vec3 &b, f8 t) {
+    // 返回的 y 就是插值结果
+    return a + t * (b - a);
+}
+
+inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
+                  const vec3 &ru, f8 tx, f8 ty) {
+    // left down, right down, left up, right up
+    // tx 和 ty 分别表示想要插的值点和 ld 的 x，y 距离
+    // 每个点的坐标存在 vec3 的前两位，值存在第 3 或 4 位
+    // 提供的四个点里只能有两种 x 和 y 坐标
+    vec3&& up_mid = lerp(lu, ru, tx);
+    vec3&& dn_mid = lerp(ld, rd, tx);
+    return lerp(up_mid, dn_mid, ty);
+}
+
+inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
+                  const vec3 &ru, const vec3& ts){
+    return lerp2(ld, rd, lu, ru, ts[0], ts[1]);
+}
+
+inline vec3 lerp2(const vec3 pts[2][2], const vec3 &ts){
+    // 根据数组的 x，y 值定位
+    return lerp2(pts[0][0], pts[1][0], pts[0][1], pts[1][1], ts[0], ts[1]);
+}
+
+// 只能存三个数所以搞不了 lerp3
 
 using pt3 = vec3;
 using color = vec3;  // 和 typedef 等价
@@ -376,10 +405,52 @@ inline vec3 vec3::refract(const vec3 &norm, f8 etain_overout) const {
     return r_out_parallel + r_out_perp;
 }
 
-vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
+inline vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
     return uv.refract(n, etai_over_etat);
 }
 
+inline vec3 lerp(const vec3 &a, const vec3 &b, f8 t) {
+    // 第 2, 3, 4 （选一个）位应该储存 a 和 b 的值
+    // t 是离 a 的 x 坐标距离
+    return a + t * (b - a);
+}
+
+inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
+                  const vec3 &ru, f8 tx, f8 ty) {
+    // left down, right down, left up, right up
+    // tx 和 ty 分别表示想要插的值点和 ld 的 x，y 距离
+    // 每个点的坐标存在 vec3 的前两位，值存在第 3 或 4 位
+    // 提供的四个点里只能有两种 x 和 y 坐标
+    vec3&& up_mid = lerp(lu, ru, tx);
+    vec3&& dn_mid = lerp(ld, rd, tx);
+    return lerp(up_mid, dn_mid, ty);
+}
+
+inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
+                  const vec3 &ru, const vec3& ts){
+    return lerp2(ld, rd, lu, ru, ts[0], ts[1]);
+}
+
+inline vec3 lerp2(const vec3 pts[2][2], const vec3 &ts){
+    // 根据数组的 x，y 值定位
+    return lerp2(pts[0][0], pts[1][0], pts[0][1], pts[1][1], ts[0], ts[1]);
+}
+
+inline vec3 lerp3(const vec3 pts[2][2][2], const vec3 &ts){
+    // 值只能放在第四个
+    // 组成二维平面的点：
+    
+    vec3&& far_up = lerp(pts[0][1][1], pts[1][1][1], ts[0]); 
+    // far 代表 z 肯定是 1，up 代表 y 肯定是 1 
+    vec3&& far_dn = lerp(pts[0][0][1], pts[1][0][1], ts[0]);
+    // far 代表 z 肯定是 1，dn 代表 y 肯定是 0
+    vec3&& clo_up = lerp(pts[0][1][0], pts[1][1][0], ts[0]);
+    // clo 代表 z 肯定是 0，up 代表 y 是 1
+    vec3&& clo_dn = lerp(pts[0][0][0], pts[1][0][0], ts[0]);
+    // clo 代表 z 是 0，dn 代表 y 是 0
+    // https://zhuanlan.zhihu.com/p/77496615
+    return lerp2(clo_dn, far_dn, clo_up, far_up, ts.z(), ts.x());
+}
 using pt3 = vec3;
 using color = vec3;
 
