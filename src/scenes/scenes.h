@@ -60,7 +60,7 @@ hittable_list rand_mul_sphere_mat() {
 
 hittable_list perlin_noise_sphere(){
     hittable_list ret;
-    auto noise_text = make_shared<noise_texture<512>>();
+    auto noise_text = make_shared<noise_texture<256>>();
     ret.add(make_shared<sphere>(pt3(0,-1000,0), 1000, make_shared<lambertian>(noise_text)));
     ret.add(make_shared<sphere>(pt3(0, 2, 0), 2, make_shared<lambertian>(noise_text)));
     return ret;

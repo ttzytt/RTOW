@@ -202,17 +202,17 @@ inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
     // tx 和 ty 分别表示想要插的值点和 ld 的 x，y 距离
     // 每个点的坐标存在 vec3 的前两位，值存在第 3 或 4 位
     // 提供的四个点里只能有两种 x 和 y 坐标
-    vec3&& up_mid = lerp(lu, ru, tx);
-    vec3&& dn_mid = lerp(ld, rd, tx);
+    vec3 &&up_mid = lerp(lu, ru, tx);
+    vec3 &&dn_mid = lerp(ld, rd, tx);
     return lerp(up_mid, dn_mid, ty);
 }
 
 inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
-                  const vec3 &ru, const vec3& ts){
+                  const vec3 &ru, const vec3 &ts) {
     return lerp2(ld, rd, lu, ru, ts[0], ts[1]);
 }
 
-inline vec3 lerp2(const vec3 pts[2][2], const vec3 &ts){
+inline vec3 lerp2(const vec3 pts[2][2], const vec3 &ts) {
     // 根据数组的 x，y 值定位
     return lerp2(pts[0][0], pts[1][0], pts[0][1], pts[1][1], ts[0], ts[1]);
 }
@@ -237,10 +237,13 @@ class vec3 {
 
     vec3(const navx2::vec3 &v) : vec_data(_mm256_set_pd(0, v[2], v[1], v[0])) {}
 
-    inline f8 operator[](int i) const { return vec_data[i]; }
-    inline f8 x() const { return (*this)[0]; }
-    inline f8 y() const { return (*this)[1]; }
-    inline f8 z() const { return (*this)[2]; }
+    vec3(f8 x) : vec_data(_mm256_set1_pd(x)) {}
+
+    inline f8 &operator[](int i) const { return vec_data[i]; }
+    inline f8 &x() const { return (*this)[0]; }
+    inline f8 &y() const { return (*this)[1]; }
+    inline f8 &z() const { return (*this)[2]; }
+    inline f8 &t() const { return (*this)[3]; }
 
     inline vec3 operator-() const {
         return _mm256_sub_pd(_mm256_setzero_pd(), vec_data);
@@ -293,6 +296,13 @@ class vec3 {
                ret[2] == 0;  // 如果全部都不更大，或者等于的话
     }
     // 下面的需要用到加减法，所以实现在外面
+
+    inline vec3 floor() const { return _mm256_floor_pd(vec_data); }
+
+    inline vec3 ceil() const { return _mm256_ceil_pd(vec_data); }
+
+    static inline vec3 zeros() { return vec3(); }
+
     inline vec3 unit_vec() const;
 
     inline vec3 reflect(const vec3 &norm) const;
@@ -308,11 +318,11 @@ inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
 }
 
 inline vec3 operator+(const vec3 &u, const vec3 &v) {
-    return vec3(_mm256_add_pd(u.vec_data, v.vec_data));
+    return _mm256_add_pd(u.vec_data, v.vec_data);
 }
 
 inline vec3 operator-(const vec3 &u, const vec3 &v) {
-    return vec3(_mm256_sub_pd(u.vec_data, v.vec_data));
+    return _mm256_sub_pd(u.vec_data, v.vec_data);
 }
 
 inline vec3 operator*(const vec3 &u, const vec3 &v) {
@@ -409,48 +419,60 @@ inline vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
     return uv.refract(n, etai_over_etat);
 }
 
-inline vec3 lerp(const vec3 &a, const vec3 &b, f8 t) {
+template <typename T>
+inline T lerp(const T &a, const T &b, f8 t) {
     // 第 2, 3, 4 （选一个）位应该储存 a 和 b 的值
-    // t 是离 a 的 x 坐标距离
+    // t 是要预测的只离 a 有多少个 a 到 b 的距离
+    // 也就是想要插值的位置离提供的点的距离
     return a + t * (b - a);
+    // return a * (1 - t) + b * t;
 }
 
-inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
-                  const vec3 &ru, f8 tx, f8 ty) {
+template <typename T>
+inline T lerp2(const T &ld, const T &rd, const T &lu, const T &ru, f8 tx,
+               f8 ty) {
     // left down, right down, left up, right up
     // tx 和 ty 分别表示想要插的值点和 ld 的 x，y 距离
     // 每个点的坐标存在 vec3 的前两位，值存在第 3 或 4 位
     // 提供的四个点里只能有两种 x 和 y 坐标
-    vec3&& up_mid = lerp(lu, ru, tx);
-    vec3&& dn_mid = lerp(ld, rd, tx);
-    return lerp(up_mid, dn_mid, ty);
+    T &&up_mid = lerp(lu, ru, tx);
+    T &&dn_mid = lerp(ld, rd, tx);
+    return lerp(dn_mid, up_mid, ty);
 }
 
-inline vec3 lerp2(const vec3 &ld, const vec3 &rd, const vec3 &lu,
-                  const vec3 &ru, const vec3& ts){
+template <typename T>
+inline T lerp2(const T &ld, const T &rd, const T &lu, const T &ru,
+               const vec3 &ts) {
     return lerp2(ld, rd, lu, ru, ts[0], ts[1]);
 }
 
-inline vec3 lerp2(const vec3 pts[2][2], const vec3 &ts){
+template <typename T>
+inline T lerp2(const T pts[2][2], const vec3 &ts) {
     // 根据数组的 x，y 值定位
     return lerp2(pts[0][0], pts[1][0], pts[0][1], pts[1][1], ts[0], ts[1]);
 }
 
-inline vec3 lerp3(const vec3 pts[2][2][2], const vec3 &ts){
+template <typename T>
+inline T lerp3(const T pts[2][2][2], const vec3 &ts) {
     // 值只能放在第四个
     // 组成二维平面的点：
-    
-    vec3&& far_up = lerp(pts[0][1][1], pts[1][1][1], ts[0]); 
-    // far 代表 z 肯定是 1，up 代表 y 肯定是 1 
-    vec3&& far_dn = lerp(pts[0][0][1], pts[1][0][1], ts[0]);
+
+    T &&far_up = lerp(pts[0][1][1], pts[1][1][1], ts[0]);
+    // far 代表 z 肯定是 1，up 代表 y 肯定是 1
+    T &&far_dn = lerp(pts[0][0][1], pts[1][0][1], ts[0]);
     // far 代表 z 肯定是 1，dn 代表 y 肯定是 0
-    vec3&& clo_up = lerp(pts[0][1][0], pts[1][1][0], ts[0]);
+    T &&clo_up = lerp(pts[0][1][0], pts[1][1][0], ts[0]);
     // clo 代表 z 肯定是 0，up 代表 y 是 1
-    vec3&& clo_dn = lerp(pts[0][0][0], pts[1][0][0], ts[0]);
+    T &&clo_dn = lerp(pts[0][0][0], pts[1][0][0], ts[0]);
     // clo 代表 z 是 0，dn 代表 y 是 0
     // https://zhuanlan.zhihu.com/p/77496615
-    return lerp2(clo_dn, far_dn, clo_up, far_up, ts.z(), ts.x());
+    
+
+    
+    return lerp2(clo_dn, far_dn, clo_up, far_up, ts.z(), ts.y());
+    // return lerp2(far_up, far_dn, clo_up, clo_dn, ts.y(), ts.z());
 }
+
 using pt3 = vec3;
 using color = vec3;
 

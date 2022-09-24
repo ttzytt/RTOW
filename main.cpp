@@ -41,6 +41,6 @@ int main(int argc, char* argv[]) {
     // hittable_list&& world = rand_mul_sphere_mat();
     hittable_list&& world = perlin_noise_sphere();
     render::out_ppm(
-        render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep),
+        render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep, 1),
         outfile);
 }

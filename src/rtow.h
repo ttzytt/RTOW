@@ -47,7 +47,7 @@ inline f8 clamp(f8 x, f8 mn, f8 mx){
 #ifdef AVX2
 using namespace avx2;
 #else
-using namespace navx2;
+using namespace avx2;
 #endif
 
 #include "./rand_utils.h"
