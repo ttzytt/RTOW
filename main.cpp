@@ -7,12 +7,12 @@
 #include "src/materials/materials.h"
 #include "src/render.h"
 #include "src/rtow.h"
-
-
 #include "src/scenes/scenes.h"
 using namespace std;
 
 int main(int argc, char* argv[]) {
+    auto start_tm = chrono::steady_clock::now();
+
     if (argc != 2) {
         cerr << "usage: <filename>\n";
     }
@@ -43,4 +43,7 @@ int main(int argc, char* argv[]) {
     render::out_ppm(
         render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep, 1),
         outfile);
+    auto end_tm = chrono::steady_clock::now();
+    auto duration_mili = std::chrono::duration_cast<chrono::milliseconds>(end_tm - start_tm);
+    cerr<<"render time: "<<duration_mili.count()<<'\n';
 }
