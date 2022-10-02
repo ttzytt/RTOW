@@ -9,7 +9,6 @@
 #include "../texture.h"
 #include "../noise.h"
 
-template <int SZ>
 class noise_texture : public texture {
    public:
     noise_texture(shared_ptr<noise> _ns) : ns(_ns) {}

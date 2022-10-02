@@ -55,6 +55,7 @@ class perlin_noise : public noise {
             }
         }
         f8 interped = trilinear_interp(nearby, ts);
+        // return interped;
         return (interped + 1.0) * 0.5;
     }
 

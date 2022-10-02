@@ -61,9 +61,12 @@ hittable_list rand_mul_sphere_mat() {
 
 hittable_list perlin_noise_sphere(){
     hittable_list ret;
-    auto ns = make_shared<perlin_noise<256>>(0.2);
-    auto noise_text = make_shared<noise_texture<256>>(ns);
-    ret.add(make_shared<sphere>(pt3(0,-1000,0), 1000, make_shared<lambertian>(noise_text)));
+    auto ns = make_shared<perlin_noise<256>>(1);
+    auto terb = make_shared<terbulence>(std::vector<f8>{1, 2, 4, 8, 16}, std::vector<f8>{1, 0.5, .25, .125, .0625}, ns);
+    // auto terb = make_shared<terbulence>(4, ns);
+	auto noise_text = make_shared<marblelike>(terb);
+	// auto noise_text = make_shared<noise_texture>(marb);
+	ret.add(make_shared<sphere>(pt3(0,-1000,0), 1000, make_shared<lambertian>(noise_text)));
     ret.add(make_shared<sphere>(pt3(0, 2, 0), 2, make_shared<lambertian>(noise_text)));
     return ret;
 }
