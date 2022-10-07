@@ -5,3 +5,4 @@
 #include "./sphere_checker.h"
 #include "./noise.h"
 #include "./marblelike.h"
+#include "./image.h"

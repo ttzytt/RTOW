@@ -2,11 +2,11 @@
 #include "../hittables/hittables.h"
 #include "../materials/materials.h"
 #include "../texture.h"
-#include "../textures/noise.h"
+#include "../textures/textures.h"
 #include "../rtow.h"
 #include "../noises/noises.h"
 
-hittable_list rand_mul_sphere_mat() {
+bvh_node rand_mul_sphere_mat() {
     hittable_list world;
     // auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
     // world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000, ground_material));
@@ -55,11 +55,12 @@ hittable_list rand_mul_sphere_mat() {
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<sphere>(pt3(4, 1, 0), 1.0, material3));
 
-    return world;
+    return bvh_node(world, 0, infinity);
+    // return world;
 }
 
 
-hittable_list perlin_noise_sphere(){
+bvh_node perlin_noise_sphere(){
     hittable_list ret;
     auto ns = make_shared<perlin_noise<256>>(1);
     auto terb = make_shared<terbulence>(std::vector<f8>{1, 2, 4, 8, 16}, std::vector<f8>{1, 0.5, .25, .125, .0625}, ns);
@@ -68,5 +69,13 @@ hittable_list perlin_noise_sphere(){
 	// auto noise_text = make_shared<noise_texture>(marb);
 	ret.add(make_shared<sphere>(pt3(0,-1000,0), 1000, make_shared<lambertian>(noise_text)));
     ret.add(make_shared<sphere>(pt3(0, 2, 0), 2, make_shared<lambertian>(noise_text)));
-    return ret;
+    return bvh_node(ret, 0, infinity);
+}
+
+bvh_node earth_img_sphere() {
+	auto earth_text =
+		make_shared<image_texture>("/mnt/e/prog/c++/RTOW/imgs/earthmap.jpg");
+	auto earth_material = make_shared<lambertian>(earth_text);
+    auto e_sphere = make_shared<sphere>(pt3(0,0,0), 2, earth_material);
+    return bvh_node(hittable_list(e_sphere), 0, infinity);
 }

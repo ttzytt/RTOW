@@ -20,15 +20,15 @@ class sphere : public hittable {
 
     static std::pair<f8, f8> get_polar_azim(const pt3& p) {
         // p: a given point on the sphere of radius one, centered at the origin.
-        // u (polar): returned value [0,1] of angle around the Y axis from X=-1.
-        // v: (azim) returned value [0,1] of angle from Y=-1 to Y=+1.
+        // u (azim): returned value [0,1] of angle around the Y axis from X=-1.
+        // v: (polar) returned value [0,1] of angle from Y=-1 to Y=+1.
         //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
         //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
         //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
 
         f8 polar_rad = acos(-p.y());              // pi
         f8 azim_rad = atan2(-p.z(), p.x()) + pi;  // +- pi
-
+        // return polar, azim
         return {polar_rad / pi, azim_rad / (pi * 2.0)};
     };
 
@@ -66,7 +66,7 @@ std::optional<hit_rec> sphere::hit(const ray& r, f8 t_min, f8 t_max) const {
 }
 
 std::optional<aabb> sphere::bounding_box(f8 tm0, f8 tm1) const {
-    return aabb(center - vec3(radius, radius, radius),
+    return aabb(center - vec3(radius),
                 center + vec3(radius, radius, radius));
 }
 

@@ -48,14 +48,14 @@ class moving_sphere : public hittable {
 
 std::optional<aabb> moving_sphere::bounding_box(f8 tm0, f8 tm1) const {
     aabb init_box(
-        cent_by_tm(tm0) - vec3(radius, radius, radius),
-        cent_by_tm(tm0) + vec3(radius, radius, radius)
+        cent_by_tm(tm0) - vec3(radius),
+        cent_by_tm(tm0) + vec3(radius)
     );
 
     aabb end_box(
-        cent_by_tm(tm1) - vec3(radius, radius, radius),
-        cent_by_tm(tm1) + vec3(radius, radius, radius)
+        cent_by_tm(tm1) - vec3(radius), // 三个分量都是 rad
+        cent_by_tm(tm1) + vec3(radius)
     );
 
-    return surrounding_box(init_box, end_box); // 返回一个能同时覆盖 initbox 和 endbox 的大的撞击盒
+    return init_box + end_box; // 返回一个能同时覆盖 initbox 和 endbox 的大的撞击盒
 }

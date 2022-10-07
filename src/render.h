@@ -45,7 +45,7 @@ std::list<block2rend> img2blocks(int wid, int hei, std::pair<int, int> target_si
     
 }
 
-color_map out_color_map(const camera& cam, const hittable_list& world,
+color_map out_color_map(const camera& cam, const hittable& world,
                         int wid = 300, int hei = 200, int sample_per_pix = 500,
                         int max_dep = 130,
                         int th_cnt = std::thread::hardware_concurrency()) {
