@@ -11,7 +11,7 @@ class lambertian : public material {
     lambertian(std::shared_ptr<texture> text) : albedo(text) {}
 
     virtual std::optional<std::pair<ray, color>> 
-    get_ray_out(const ray& r_in, const hit_rec& rec) const override {
+    ray_reflected(const ray& r_in, const hit_rec& rec) const override {
         vec3 ref_dir = rec.norm + rand_unit_vec();
 
         if(ref_dir.near_zero()) // 如果 rand_unit_vec() 等于 -rec.norm 

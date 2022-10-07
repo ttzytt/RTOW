@@ -7,7 +7,7 @@ class dielectric : public material {
     dielectric(f8 ref, const color& alb = color(1, 1, 1), f8 fuz = 0)
         : ref_idx(ref), albedo(alb), fuzz(fuz) {}
 
-    virtual std::optional<std::pair<ray, color>> get_ray_out(
+    virtual std::optional<std::pair<ray, color>> ray_reflected(
         const ray& r_in, const hit_rec& rec) const override {
         f8 ref_ratio = rec.front_face ? (1.0 / ref_idx) : ref_idx;
         // 光线从空气进入玻璃球还是玻璃球进入空气？

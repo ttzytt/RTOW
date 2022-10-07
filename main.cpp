@@ -7,6 +7,8 @@
 #include "src/render.h"
 #include "src/rtow.h"
 #include "src/scenes/scenes.h"
+#include "src/backgrounds/backgrounds.h"
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -21,10 +23,11 @@ int main(int argc, char* argv[]) {
 
     // img
     const f4 asp_ratio = 3.0 / 2.0;
-    const int wid = 200;
+    const int wid = 300;
     const int hei = round(wid / asp_ratio);
     const int sample_per_pixel = 100;
     const int max_dep = 120;
+    const background &back = blue_sky_back;
 
     // cam
     const int coeff = 1;
@@ -40,7 +43,7 @@ int main(int argc, char* argv[]) {
     // hittable_list&& world = rand_mul_sphere_mat();
 	hittable&& world = rand_mul_sphere_mat();
 	render::out_ppm(
-        render::out_color_map(cam, world, wid, hei, sample_per_pixel, max_dep, 1),
+        render::out_color_map(cam, world, back, wid, hei, sample_per_pixel, max_dep),
         outfile);
     auto end_tm = chrono::steady_clock::now();
     auto duration_mili = std::chrono::duration_cast<chrono::milliseconds>(end_tm - start_tm);
