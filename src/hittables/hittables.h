@@ -4,3 +4,4 @@
 #include "sphere.h"
 #include "hittable_list.h"
 #include "bvh.h"
+#include "rect_slice.h"

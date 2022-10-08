@@ -5,14 +5,13 @@
 #include <optional>
 #include <thread>
 
+#include "backgrounds/backgrounds.h"
 #include "camera.h"
 #include "externals/tqdm.h"
 #include "hittable.h"
 #include "hittables/hittable_list.h"
 #include "material.h"
 #include "rtow.h"
-#include "backgrounds/backgrounds.h"
-
 
 using color_map = std::vector<std::vector<color>>;
 
@@ -24,21 +23,25 @@ struct block2rend {
 	std::pair<int, int> col_range;	// inclusive
 };
 
-color ray_color(const ray& r, const hittable& world, const background& back, int dep_left) {
+struct config{
+
+};
+
+color ray_color(const ray& r, const hittable& world, const background& back,
+				int dep_left) {
 	if (dep_left <= 0) return color();
 
 	auto&& rec = world.hit(r, 0.00001, infinity);
-	if (rec.has_value()) {
-		auto&& reflect_ret = rec->mat_ptr->ray_reflected(r, *rec);
-		if (reflect_ret.has_value()) {
-			auto& [r_ref, attenua] = *reflect_ret;
+	if (!rec.has_value()) return back.value(r); // 如果没有撞到任何东西
 
-			return attenua * ray_color(r_ref, world, back, dep_left - 1);
-		}
-		return color();	 // 0, 0, 0
-	}
+	auto&& reflect_ret = rec->mat_ptr->ray_reflected(r, *rec);
+	
+	color emitted = rec->mat_ptr->emitted(rec->polar, rec->azim, rec->hit_pt);
+	if (!reflect_ret.has_value()) // 如果物体不反射
+		return emitted;
 
-    return back.value(r);
+	auto& [r_ref, attenua] = *reflect_ret;
+	return emitted + attenua * ray_color(r_ref, world, back, dep_left - 1);
 }
 
 // std::list<block2rend> img2blocks(int wid, int hei, std::pair<int, int>
@@ -46,7 +49,8 @@ color ray_color(const ray& r, const hittable& world, const background& back, int
 
 // }
 
-color_map out_color_map(const camera& cam, const hittable& world, const background& back = blue_sky_back, int wid = 300,
+color_map out_color_map(const camera& cam, const hittable& world,
+						const background& back = blue_sky_back, int wid = 300,
 						int hei = 200, int sample_per_pix = 500,
 						int max_dep = 130,
 						int th_cnt = std::thread::hardware_concurrency()) {

@@ -36,9 +36,9 @@ class gradient : public background {
 
 class pure : public background {
    public:
-	pure(const color& _c) : c(_c) {}
+	constexpr pure(const color& _c) : c(_c) {}
 
-	color value(const ray& r) const override { return c; }
+	constexpr color value(const ray& r) const override { return c; }
 	color c;
 };
 

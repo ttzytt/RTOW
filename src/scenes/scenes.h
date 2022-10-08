@@ -79,3 +79,17 @@ bvh_node earth_img_sphere() {
     auto e_sphere = make_shared<sphere>(pt3(0,0,0), 2, earth_material);
     return bvh_node(hittable_list(e_sphere), 0, infinity);
 }
+
+bvh_node light_emit_rect(){
+    hittable_list world;
+    auto marble = make_shared<marblelike>(); // 纹理
+    world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000, make_shared<lambertian>(marble)));
+	world.add(make_shared<sphere>(pt3(0, 2, 0), 2,
+								  make_shared<lambertian>(marble)));
+	auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1) * 3,
+											   color(0.9, 0.9, 0.9 * 3));
+	auto diff_light_mat = make_shared<diffuse_light>(checker);
+    world.add(make_shared<rect_slice<2>>(3, 5, 1, 4, -2, diff_light_mat));
+    // return world;
+    return bvh_node(world, 0, infinity);
+}

@@ -12,8 +12,8 @@ inline color gamma_correct(const color& pixel, f8 gamma_val) {
 void write_color(std::ostream& out, const color& pixel) {
     color&& corrected = gamma_correct(pixel, 2.2);
 #ifdef OUT
-    out << round(corrected[0] * MX_COLOR) << ' ' << round(corrected[1] * MX_COLOR)
-        << ' ' << round(corrected[2] * MX_COLOR) << '\n';
+    out << clamp(round(corrected[0] * MX_COLOR), 0, MX_COLOR) << ' ' << clamp(round(corrected[1] * MX_COLOR), 0, MX_COLOR)
+        << ' ' << clamp(round(corrected[2] * MX_COLOR), 0, MX_COLOR) << '\n';
 #endif
 }
 

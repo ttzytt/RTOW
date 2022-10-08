@@ -22,14 +22,14 @@ class terbulence : public noise {
 		// 只有原来过渡的地方是暗的，感觉是把明暗交界的边描
 	}
 
-	terbulence(int _cnt, shared_ptr<noise> _base) : cnt(_cnt), base(_base) {
+	terbulence(int _cnt = 6, shared_ptr<noise> _base = make_shared<perlin_noise<256>>()) : cnt(_cnt), base(_base) {
 		wt_tot = pow(2, cnt);
 		f8 cur = 1;
 		// wts = 0.5, 0.25, 0.125 ...
 		freqs.resize(cnt), wts.resize(cnt);
 		for (int i = 0; i < cnt; i++) {
 			freqs[i] = cur;
-			wts[i] = cur;
+			wts[i] = pow(2, -cur);
 			cur *= 2;
 		}
 	}

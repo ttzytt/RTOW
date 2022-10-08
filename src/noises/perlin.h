@@ -20,7 +20,7 @@ template <int SIZ>
 // 但是 SIZ 必须是 2^x，要不然 & (SIZ - 1) 时就会损失很多精度
 class perlin_noise : public noise {
    public:
-    perlin_noise(f8 _square_sz = 0.25, std::function<vec3(const vec3&)> _maper = _3t2_2t3)
+    perlin_noise(f8 _square_sz = 1, std::function<vec3(const vec3&)> _maper = _3t2_2t3)
         : square_sz(_square_sz), interpo_maper(_maper) {
         static auto generator = std::mt19937();
         std::iota(x_perm.begin(), x_perm.end(), 0);
