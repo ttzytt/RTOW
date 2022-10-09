@@ -228,7 +228,7 @@ class vec3 {
 
 	constexpr vec3(const f8 x) : vec_data{x, x, x, x} {}
 
-	inline f8 &operator[](int i) const { return vec_data[i]; }
+	inline f8 &operator[](const int i) const { return vec_data[i]; }
 	inline f8 &x() const { return (*this)[0]; }
 	inline f8 &y() const { return (*this)[1]; }
 	inline f8 &z() const { return (*this)[2]; }

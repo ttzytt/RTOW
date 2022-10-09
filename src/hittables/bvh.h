@@ -9,7 +9,7 @@
 class bvh_node : public hittable {
    public:
 	bvh_node() = default;
-	bvh_node(const hittable_list& list, f8 tm0, f8 tm1)
+	bvh_node(const hittable_list& list, f8 tm0 = 0, f8 tm1 = infinity)
 		: bvh_node(list.objs, 0, list.objs.size(), tm0, tm1) {}
 
 	bvh_node(const std::vector<std::shared_ptr<hittable>>& objs, int beg,

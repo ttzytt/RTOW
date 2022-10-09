@@ -44,3 +44,6 @@ class pure : public background {
 
 const gradient blue_sky_back(color(1), color(.5, .8, 1), 1);
 const pure pure_black_back(color(0));
+
+const auto blue_sky_back_ptr = make_shared<gradient>(color(1), color(.5, .8, 1), 1);
+const auto pure_black_back_ptr = make_shared<pure>(color(0));

@@ -7,7 +7,7 @@
 class aabb {
    public:
     aabb() = default;
-    aabb(const pt3& _mn, const pt3& _mx) : mn(_mn), mx(_mx) {}
+    constexpr aabb(const pt3& _mn, const pt3& _mx) : mn(_mn), mx(_mx) {}
     // x0 = a_x + b_x * t
     // t = (x_0 - a_x) / (b_x)
     bool hit(const ray& r, f8 tmin, f8 tmax) const {

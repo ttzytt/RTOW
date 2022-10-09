@@ -69,12 +69,8 @@ class rect_slice : public hittable {
 	}
 
 	std::optional<aabb> bounding_box(f8 tm0, f8 tm1) const override {
-		pt3&& mn = g_pt_by_axis(a00, a10, a2 - 0.0001, AXIS);
-		pt3&& mx = g_pt_by_axis(a01, a11, a2 + 0.0001, AXIS);
-		return aabb(mn, mx);
-		// return aabb(g_pt_by_axis(a00, a10, a2 - 0.0001, AXIS),
-		// 			g_pt_by_axis(a10, a11, a2 + 0.0001, AXIS));
-        // 第二种写法会出错，不知道为啥
+		return aabb(g_pt_by_axis(a00, a10, a2 - 0.0001, AXIS),
+					g_pt_by_axis(a01, a11, a2 + 0.0001, AXIS));
 	}
 
 	f8 a00, a01, a10, a11, a2;
