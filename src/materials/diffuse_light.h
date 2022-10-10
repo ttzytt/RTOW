@@ -1,9 +1,9 @@
 #pragma once
 #include <optional>
 
-#include "../material.h"
+#include "material.h"
 #include "../rtow.h"
-#include "../textures/textures.h"
+#include "../textures/texture.h"
 
 class diffuse_light : public material {
 	// 给纹理类换个皮

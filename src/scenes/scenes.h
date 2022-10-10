@@ -3,7 +3,6 @@
 #include "../materials/materials.h"
 #include "../noises/noises.h"
 #include "../rtow.h"
-#include "../texture.h"
 #include "../textures/textures.h"
 #include "scene.h"
 
@@ -23,7 +22,7 @@ scene rand_mul_sphere_mat() {
 			pt3 center(a + 0.9 * rand_f8(), 0.2, b + 0.9 + rand_f8());
 			if ((center - pt3(4, 0.2, 0)).len() > 0.9) {
 				// 距离第一个大球远
-				shared_ptr<material> sphere_mat;
+				shared_ptr<material> sphere_mat; 
 				if (choose_mat < 0.5) {
 					color albedo = color::rand() * color::rand();
 					sphere_mat = make_shared<lambertian>(albedo);
@@ -144,18 +143,6 @@ scene light_emit_rect()   {
     auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, 20, asp_ratio, aperture, dist_to_focus,
 			   0.0, 1.0);
 	// 相机设置
-
-
-	const int wid = 300;
-	render::config conf{
-		.wid = wid,
-		.hei = round((f8)wid / asp_ratio),
-		.sample_per_pix = 100,
-		.max_dep = 120,
-		.th_cnt = 1,
-
-
-	};
 	scene ret(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
     return ret;
 }

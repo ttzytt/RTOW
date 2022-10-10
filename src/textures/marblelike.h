@@ -1,7 +1,7 @@
 #pragma once
 #include "../noises/noises.h"
 #include "../rtow.h"
-#include "../texture.h"
+#include "./texture.h"
 
 class marblelike : public texture {
    public:

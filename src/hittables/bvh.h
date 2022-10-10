@@ -1,8 +1,8 @@
 #pragma once
 #include "../aabb.h"
 #include "../rtow.h"
-#include "functional"
-#include "hittables.h"
+#include <functional>
+#include "hittable.h"
 
 // bouding box hierarchy
 

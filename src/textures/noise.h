@@ -6,8 +6,8 @@
 
 #include "../noises/perlin.h"
 #include "../rtow.h"
-#include "../texture.h"
-#include "../noise.h"
+#include "./texture.h"
+#include "../noises/noise.h"
 
 class noise_texture : public texture {
    public:

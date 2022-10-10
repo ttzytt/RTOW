@@ -2,7 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../externals/stb_image.h"
-#include "../texture.h"
+#include "./texture.h"
 
 class image_texture : public texture {
 	// 贴图类

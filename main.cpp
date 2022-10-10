@@ -7,7 +7,6 @@
 #include "src/materials/materials.h"
 #include "src/render.h"
 #include "src/rtow.h"
-#include "src/scenes/scene.h"
 #include "src/scenes/scenes.h"
 using namespace std;
 

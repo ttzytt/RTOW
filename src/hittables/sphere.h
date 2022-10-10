@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include "../hittable.h"
+#include "hittable.h"
 #include "../rtow.h"
 #include "../vec3.h"
 

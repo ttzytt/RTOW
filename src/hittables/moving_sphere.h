@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
 
-#include "../hittable.h"
-#include "../material.h"
+#include "hittable.h"
+#include "../materials/material.h"
 #include "../rtow.h"
 #include "sphere.h"
 

@@ -1,21 +1,20 @@
 #include <optional>
-
 #include "../aabb.h"
-#include "../hittable.h"
+#include "hittable.h"
 #include "../rtow.h"
 #pragma once
 
-constexpr pt3 g_pt_by_axis(const f8 a, const f8 b, const f8 c, const int axis) {
+constexpr inline pt3 g_pt_by_axis(const f8 a, const f8 b, const f8 c, const int axis) {
 	// cosnteval 只能编译期运行，constexpr 不是
 	switch (axis) {
 		case 0:
-			return pt3(c, a, b);
+			return pt3{c, a, b};
 		case 1:
-			return pt3(a, c, b);
+			return pt3{a, c, b};
 		case 2:
-			return pt3(a, b, c);
+			return pt3{a, b, c};
 	}
-	return pt3(0);
+	return pt3{0, 0, 0};
 }
 
 constexpr std::pair<int, int> g_other_axis_id(const int axis) {

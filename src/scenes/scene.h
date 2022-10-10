@@ -3,7 +3,7 @@
 
 #include "../backgrounds/backgrounds.h"
 #include "../camera.h"
-#include "../hittable.h"
+#include "../hittables/hittable.h"
 #include "../rtow.h"
 
 

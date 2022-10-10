@@ -1,5 +1,6 @@
-#include "../material.h"
+#include "material.h"
 #include "../rtow.h"
+#include <optional>
 #pragma once
 
 class dielectric : public material {

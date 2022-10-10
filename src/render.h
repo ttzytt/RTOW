@@ -8,9 +8,8 @@
 #include "backgrounds/backgrounds.h"
 #include "camera.h"
 #include "externals/tqdm.h"
-#include "hittable.h"
 #include "hittables/hittable_list.h"
-#include "material.h"
+#include "materials/material.h"
 #include "rtow.h"
 #include "scenes/scene.h"
 

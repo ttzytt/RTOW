@@ -1,6 +1,6 @@
 #pragma once
 #include "../rtow.h"
-#include "../texture.h"
+#include "./texture.h"
 
 class fixed_color : public texture{
     public:

@@ -1,7 +1,4 @@
 #pragma once
-
-#define __AVX__ 1
-#define __AVX2__ 1
 #include <ammintrin.h>
 #include <emmintrin.h>
 #include <immintrin.h>
@@ -222,11 +219,10 @@ class vec3 {
    public:
 	constexpr vec3(const f8 x, const f8 y, const f8 z = 0, const f8 t = 0)
 		: vec_data{x, y, z, t} {}
-
-	vec3(const __m256d &_vec_data) : vec_data(_vec_data) {}
+	constexpr vec3(const __m256d &_vec_data) : vec_data(_vec_data) {}
 	vec3() : vec_data(_mm256_setzero_pd()) {}
-
 	constexpr vec3(const f8 x) : vec_data{x, x, x, x} {}
+	constexpr vec3(const vec3& x) : vec_data(x.vec_data) {}
 
 	inline f8 &operator[](const int i) const { return vec_data[i]; }
 	inline f8 &x() const { return (*this)[0]; }

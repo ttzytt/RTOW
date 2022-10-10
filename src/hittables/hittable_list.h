@@ -1,9 +1,9 @@
 #include <memory>
 #include <vector>
-#include "../hittable.h"
+#include "hittable.h"
 #include "../rtow.h"
 #include "../aabb.h"
-
+#include <optional>
 #pragma once
 
 class hittable_list : public hittable {

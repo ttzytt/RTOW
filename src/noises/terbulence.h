@@ -2,7 +2,7 @@
 #include <exception>
 #include <vector>
 
-#include "../noise.h"
+#include "noise.h"
 #include "../rtow.h"
 #include "./interpo_mapers.h"
 

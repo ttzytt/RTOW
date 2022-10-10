@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "../rtow.h"
-#include "../texture.h"
+#include "./texture.h"
 #include "fixed.h"
 
 class checker_texture : public texture {
