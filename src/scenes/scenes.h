@@ -22,7 +22,7 @@ scene rand_mul_sphere_mat() {
 			pt3 center(a + 0.9 * rand_f8(), 0.2, b + 0.9 + rand_f8());
 			if ((center - pt3(4, 0.2, 0)).len() > 0.9) {
 				// 距离第一个大球远
-				shared_ptr<material> sphere_mat; 
+				shared_ptr<material> sphere_mat;
 				if (choose_mat < 0.5) {
 					color albedo = color::rand() * color::rand();
 					sphere_mat = make_shared<lambertian>(albedo);
@@ -115,13 +115,14 @@ scene earth_img_sphere() {
 	vec3 vup(0, 1, 0);
 	auto dist_to_focus = 10.0;
 	auto aperture = 0;
-	auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, 20, asp_ratio, aperture, dist_to_focus,
-			   0.0, 1.0);
+	auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, 20, asp_ratio,
+									   aperture, dist_to_focus, 0.0, 1.0);
 	//-----------相机设置
-	return scene(make_shared<bvh_node>(hittable_list(e_sphere)), blue_sky_back_ptr, cam_ptr);
+	return scene(make_shared<bvh_node>(hittable_list(e_sphere)),
+				 blue_sky_back_ptr, cam_ptr);
 }
 
-scene light_emit_rect()   {
+scene light_emit_rect() {
 	hittable_list world;
 	auto marble = make_shared<marblelike>();  // 纹理
 	world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000,
@@ -139,10 +140,35 @@ scene light_emit_rect()   {
 	vec3 vup(0, 1, 0);
 	auto dist_to_focus = 10.0;
 	auto aperture = 0;
-    
-    auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, 20, asp_ratio, aperture, dist_to_focus,
-			   0.0, 1.0);
+
+	auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, 20, asp_ratio,
+									   aperture, dist_to_focus, 0.0, 1.0);
 	// 相机设置
 	scene ret(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
-    return ret;
+	return ret;
 }
+
+scene cornell_box() {
+	hittable_list world;
+
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+	auto cbox = make_shared<box>(pt3(0), pt3(555), (std::array<shared_ptr<material>, 6>){green, red, white, white, nullptr, white});
+	world.add(cbox);
+	world.add(make_shared<rect_slice<1>>(213, 343, 227, 332, 554, light));
+
+	const f4 asp_ratio = 1;
+	pt3 lookfrom(278, 278, -800);
+	pt3 lookat(278, 278, 0);
+	vec3 vup(0, 1, 0);
+	auto dist_to_focus = 10.0;
+	auto aperture = 0;
+	f8 vfov = 40.0;
+
+	auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, vfov, asp_ratio,
+									   aperture, dist_to_focus, aperture, 1.0);
+	return scene(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
+};

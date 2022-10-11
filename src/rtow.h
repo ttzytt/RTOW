@@ -17,6 +17,8 @@ using std::sqrt;
 using f16 = long double;// 16 字节浮点
 using f8 = double;      // 8 字节浮点
 using f4 = float;       // 4 字节浮点
+using deg = f8;
+using rad = f8;
 
 using i1 = char;        // 1 字节整数
 using i2 = short;       // 2 字节整数
@@ -43,7 +45,7 @@ inline f8 clamp(f8 x, f8 mn, f8 mx){
 
 #include "vec3.h"
 
-
+#define AVX2
 #ifdef AVX2
 using namespace avx2;
 #else

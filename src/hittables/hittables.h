@@ -5,3 +5,5 @@
 #include "hittable_list.h"
 #include "bvh.h"
 #include "rect_slice.h"
+#include "translate.h"
+#include "box.h"

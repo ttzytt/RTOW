@@ -1,6 +1,9 @@
 *.ppm
 *.gdbinit
+build
 build/*
 .vscode/*
 *.gch
 *.out
+cmake_build
+cmake_build/*

@@ -9,6 +9,8 @@
 #include <tuple>
 
 using f8 = double;
+using deg = f8;
+using rad = f8;
 
 inline f8 rand_f8();
 inline f8 rand_f8(f8 mn, f8 mx);
@@ -222,7 +224,7 @@ class vec3 {
 	constexpr vec3(const __m256d &_vec_data) : vec_data(_vec_data) {}
 	vec3() : vec_data(_mm256_setzero_pd()) {}
 	constexpr vec3(const f8 x) : vec_data{x, x, x, x} {}
-	constexpr vec3(const vec3& x) : vec_data(x.vec_data) {}
+	constexpr vec3(const vec3 &x) : vec_data(x.vec_data) {}
 
 	inline f8 &operator[](const int i) const { return vec_data[i]; }
 	inline f8 &x() const { return (*this)[0]; }
@@ -299,6 +301,10 @@ class vec3 {
 	inline vec3 reflect(const vec3 &norm) const;
 
 	inline vec3 refract(const vec3 &norm, f8 etain_over_out) const;
+
+	inline vec3 rotate(deg angle, int axis) const;
+
+	inline vec3 rotate(deg sin, deg cos, int axis) const;
 
    public:
 	__m256d vec_data __attribute__((aligned(32)));
@@ -401,6 +407,37 @@ inline vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
 	return uv.refract(n, etai_over_etat);
 }
 
+inline vec3 vec3::rotate(f8 sin, f8 cos, int axis) const {
+	// x -> y, y -> z, z -> -x
+	switch (axis) {
+		case 0:
+			return {x(), 
+					cos * y() - sin * z(), 
+					sin * y() + cos * z()};
+		case 1:
+			return {cos * x() + sin * z(), 
+					y(), 
+					-sin * x() + cos * z()};
+		case 2:
+			return {cos * x() - sin * y(), 
+					sin * x() + cos * y(), 
+					z()};
+	}
+}
+
+// 绕哪个轴旋转
+inline vec3 vec3::rotate(rad angle, int axis) const {
+	return rotate(std::sin(angle), std::cos(angle), axis);
+}
+
+inline vec3 vmax(const vec3& a, const vec3& b){
+	return _mm256_max_pd(a.vec_data, b.vec_data);
+}
+
+inline vec3 vmin(const vec3 &a, const vec3 &b) {
+	return _mm256_min_pd(a.vec_data, b.vec_data);
+}
+
 template <typename T>
 inline T lerp(const T &a, const T &b, const T &t) {
 	// t 是要预测的值离 a 有多少个 a 到 b 的距离
@@ -455,7 +492,6 @@ inline f8 lerp3(const vec3 pts[2], const vec3 &ts) {
 
 using pt3 = vec3;
 using color = vec3;
-
 }  // namespace avx2
 
 // TODO: 之后替换成一个类，avx 继承自这个类？

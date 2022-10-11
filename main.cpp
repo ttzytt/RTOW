@@ -21,17 +21,18 @@ int main(int argc, char* argv[]) {
 	outfile.open(argv[1]);
 
 	// img
-	const f4 asp_ratio = 3.0 / 2.0;
+	const f4 asp_ratio = 1;
 	const int wid = 300;
+	int mx_th = std::thread::hardware_concurrency();
 	render::config conf{
 		.wid = wid,
 		.hei = round((f8)wid / asp_ratio),
-		.sample_per_pix = 100,
+		.sample_per_pix = 500,
 		.max_dep = 120,
-		.th_cnt = 1,
+		.th_cnt = mx_th,
 	};
 
-	light_emit_rect().out_ppm(outfile, conf);
+	cornell_box().out_ppm(outfile, conf);
 
 	auto end_tm = chrono::steady_clock::now();
 
