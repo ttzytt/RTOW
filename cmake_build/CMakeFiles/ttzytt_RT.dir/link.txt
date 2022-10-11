@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/ttzytt_RT.dir/main.cpp.o -o ttzytt_RT 
