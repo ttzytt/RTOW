@@ -6,6 +6,7 @@
 #include "bvh.h"
 #include "hittable_list.h"
 #include "rect_slice.h"
+#include <algorithm>
 
 class box : public hittable {
    public:
@@ -55,6 +56,6 @@ box::box(const pt3& _mn, const pt3& _mx,
 box::box(const pt3& _mn, const pt3& _mx, const shared_ptr<material>& mats) {
 	// mats 顺序：左右，上下，前后
     std::array<shared_ptr<material>, 6> arr;
-    arr.fill(mats);
-	box(_mn, _mx, arr);
+	std::fill(arr.begin(), arr.end(), mats);
+	*this = box(_mn, _mx, arr);
 }

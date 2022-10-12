@@ -156,9 +156,25 @@ scene cornell_box() {
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
 	auto light = make_shared<diffuse_light>(color(15, 15, 15));
 
-	auto cbox = make_shared<box>(pt3(0), pt3(555), (std::array<shared_ptr<material>, 6>){green, red, white, white, nullptr, white});
+	auto cbox = make_shared<box>(pt3(0), pt3(555),
+								 (std::array<shared_ptr<material>, 6>){
+									 green, red, white, white, nullptr, white});
 	world.add(cbox);
 	world.add(make_shared<rect_slice<1>>(213, 343, 227, 332, 554, light));
+
+	shared_ptr<hittable> box1 =
+		make_shared<box>(pt3(0, 0, 0), pt3(165, 330, 165), white);
+	box1 = make_shared<rotate_trans<1>>(box1, 15);
+	box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+	world.add(box1);
+
+	shared_ptr<hittable> box2 =
+		make_shared<box>(pt3(0, 0, 0), pt3(165, 165, 165), white);
+	box2 = make_shared<rotate_trans<1>>(box2, -18);
+	box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+	world.add(box2);
+
+	//------------ 相机设置
 
 	const f4 asp_ratio = 1;
 	pt3 lookfrom(278, 278, -800);

@@ -19,13 +19,14 @@ class translate : public hittable {
 std::optional<hit_rec> translate::hit(const ray& r, f8 t_min,
 									  f8 t_max) const {
 	ray move_r(r.orig - offset, r.dir, r.tm);
-	hit_rec&& rec = *ptr->hit(move_r, t_min, t_max);
-	rec.hit_pt += offset;
-	rec.set_face_normal(move_r, rec.norm);
+	auto rec = ptr->hit(move_r, t_min, t_max);
+	rec->hit_pt += offset;
+	rec->set_face_normal(move_r, rec->norm);
 	return rec;
 }
 
 std::optional<aabb> translate::bounding_box(f8 tm0, f8 tm1) const {
-	aabb&& box = *ptr->bounding_box(tm0, tm1);
-	return aabb(box.mn + offset, box.mx + offset);
+	auto box = ptr->bounding_box(tm0, tm1);
+	if(!box.has_value()) return std::nullopt;
+	return aabb(box->mn + offset, box->mx + offset);
 }

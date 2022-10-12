@@ -1,7 +1,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <functional>
+
 
 #pragma once
 
@@ -42,6 +42,7 @@ inline f8 clamp(f8 x, f8 mn, f8 mx){
     return x;
 }
 
+inline f8 base_log(f8 base, f8 x) { return log(base) / log(x); }
 
 #include "vec3.h"
 

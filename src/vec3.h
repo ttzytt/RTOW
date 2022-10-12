@@ -302,9 +302,9 @@ class vec3 {
 
 	inline vec3 refract(const vec3 &norm, f8 etain_over_out) const;
 
-	inline vec3 rotate(deg angle, int axis) const;
+	inline vec3 rotate(rad angle, int axis) const;
 
-	inline vec3 rotate(deg sin, deg cos, int axis) const;
+	inline vec3 rotate(rad sin, rad cos, int axis) const;
 
    public:
 	__m256d vec_data __attribute__((aligned(32)));
@@ -407,20 +407,20 @@ inline vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
 	return uv.refract(n, etai_over_etat);
 }
 
-inline vec3 vec3::rotate(f8 sin, f8 cos, int axis) const {
+inline vec3 vec3::rotate(f8 sin_the, f8 cos_the, int axis) const {
 	// x -> y, y -> z, z -> -x
 	switch (axis) {
 		case 0:
 			return {x(), 
-					cos * y() - sin * z(), 
-					sin * y() + cos * z()};
+					cos_the * y() - sin_the * z(), 
+					sin_the * y() + cos_the * z()};
 		case 1:
-			return {cos * x() + sin * z(), 
+			return {cos_the * x() + sin_the * z(), 
 					y(), 
-					-sin * x() + cos * z()};
+					-sin_the * x() + cos_the * z()};
 		case 2:
-			return {cos * x() - sin * y(), 
-					sin * x() + cos * y(), 
+			return {cos_the * x() - sin_the * y(), 
+					sin_the * x() + cos_the * y(), 
 					z()};
 	}
 }

@@ -6,4 +6,5 @@
 #include "bvh.h"
 #include "rect_slice.h"
 #include "translate.h"
+#include "rotate.h"
 #include "box.h"

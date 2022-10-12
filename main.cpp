@@ -8,11 +8,10 @@
 #include "src/render.h"
 #include "src/rtow.h"
 #include "src/scenes/scenes.h"
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	auto start_tm = chrono::steady_clock::now();
-
 	if (argc != 2) {
 		cerr << "usage: <filename>\n";
 	}
@@ -31,9 +30,9 @@ int main(int argc, char* argv[]) {
 		.max_dep = 120,
 		.th_cnt = mx_th,
 	};
-
+	
+	auto start_tm = chrono::steady_clock::now();
 	cornell_box().out_ppm(outfile, conf);
-
 	auto end_tm = chrono::steady_clock::now();
 
 	auto duration_mili =
