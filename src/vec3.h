@@ -152,7 +152,7 @@ inline vec3 vec3::refract(const vec3 &norm, f8 etain_overout) const {
 	return r_out_parallel + r_out_perp;
 }
 
-vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
+vec3 refract(const vec3 &uv, const vec3 &n, f8 etai_over_etat) {
 	return uv.refract(n, etai_over_etat);
 }
 

@@ -21,14 +21,14 @@ int main(int argc, char* argv[]) {
 
 	// img
 	const f4 asp_ratio = 1;
-	const int wid = 300;
+	const int wid = 200;
 	int mx_th = std::thread::hardware_concurrency();
 	render::config conf{
 		.wid = wid,
 		.hei = round((f8)wid / asp_ratio),
-		.sample_per_pix = 500,
+		.sample_per_pix = 250,
 		.max_dep = 120,
-		.th_cnt = mx_th,
+		.th_cnt = 1,
 	};
 	
 	auto start_tm = chrono::steady_clock::now();

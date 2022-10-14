@@ -42,7 +42,7 @@ inline f8 clamp(f8 x, f8 mn, f8 mx){
     return x;
 }
 
-inline f8 base_log(f8 base, f8 x) { return log(base) / log(x); }
+inline f8 base_log(f8 x, f8 base) { return log(x) / log(base); }
 
 #include "vec3.h"
 

@@ -154,25 +154,25 @@ scene cornell_box() {
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
-	auto light = make_shared<diffuse_light>(color(15, 15, 15));
+	auto light = make_shared<diffuse_light>(color(7));
 
 	auto cbox = make_shared<box>(pt3(0), pt3(555),
 								 (std::array<shared_ptr<material>, 6>){
-									 green, red, white, white, nullptr, white});
+									 red, green, white, white, nullptr, white});
 	world.add(cbox);
-	world.add(make_shared<rect_slice<1>>(213, 343, 227, 332, 554, light));
+	world.add(make_shared<rect_slice<1>>(113, 443, 127, 432, 554, light));
 
 	shared_ptr<hittable> box1 =
 		make_shared<box>(pt3(0, 0, 0), pt3(165, 330, 165), white);
 	box1 = make_shared<rotate_trans<1>>(box1, 15);
 	box1 = make_shared<translate>(box1, vec3(265, 0, 295));
-	world.add(box1);
+	world.add(make_shared<const_fog>(box1, color(0)));
 
 	shared_ptr<hittable> box2 =
 		make_shared<box>(pt3(0, 0, 0), pt3(165, 165, 165), white);
-	box2 = make_shared<rotate_trans<1>>(box2, -18);
-	box2 = make_shared<translate>(box2, vec3(130, 0, 65));
-	world.add(box2);
+	// box2 = make_shared<rotate_trans<1>>(box2, -18);
+	box2 = make_shared<translate>(box2, vec3(130, 0.001, 65));
+	world.add(make_shared<const_fog>(box2, color(0)));
 
 	//------------ 相机设置
 

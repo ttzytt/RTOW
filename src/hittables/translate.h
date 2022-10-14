@@ -20,6 +20,7 @@ std::optional<hit_rec> translate::hit(const ray& r, f8 t_min,
 									  f8 t_max) const {
 	ray move_r(r.orig - offset, r.dir, r.tm);
 	auto rec = ptr->hit(move_r, t_min, t_max);
+	if(!rec.has_value()) return std::nullopt;
 	rec->hit_pt += offset;
 	rec->set_face_normal(move_r, rec->norm);
 	return rec;

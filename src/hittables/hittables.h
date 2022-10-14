@@ -8,3 +8,4 @@
 #include "translate.h"
 #include "rotate.h"
 #include "box.h"
+#include "const_fog.h"

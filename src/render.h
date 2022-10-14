@@ -71,6 +71,10 @@ color_map out_color_map(scene sc, const config& conf) {
 					 j--) {
 					for (int i = 0; i < conf.wid; i++) {
 						color pixel(0, 0, 0);
+						if(j == 75 && i == 170){
+							std::cerr<<"on pt\n";
+						}
+
 						for (int k = 0; k < conf.sample_per_pix; k++) {
 							f8 x = (i + rand_f8()) / (conf.wid - 1);
 							f8 y = (j + rand_f8()) / (conf.hei - 1);
