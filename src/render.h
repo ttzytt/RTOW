@@ -51,17 +51,24 @@ class renderer {
 		// 返回待渲染的块
 		std::pair<int, int>&blksiz = conf.blksiz, picsiz = conf.picsiz;
 		int lst_x = 0, lst_y = 0;
+		std::vector<block2rend> tmp;
 		for (int j = std::min(blksiz.second, picsiz.second);
 			 j <= picsiz.second && lst_y != picsiz.second;
 			 j += std::min(blksiz.second, picsiz.second - j)) {
 			for (int i = std::min(blksiz.first, picsiz.first);
 				 i <= picsiz.first && lst_x != picsiz.first;
 				 i += std::min(blksiz.first, picsiz.first - i)) {
-				jobs.push({{lst_x, i}, {lst_y, j}});
+				tmp.push_back({{lst_x, i}, {lst_y, j}});
 				lst_x = i;
 			}
 			lst_y = j;
 			lst_x = 0;
+		}
+		static auto generator = std::mt19937();
+		std::shuffle(tmp.begin(), tmp.end(), generator);
+		// 渲染速度更均匀
+		for(auto cur : tmp){
+			jobs.push(cur);
 		}
 		tot_blk = jobs.size();
 	}

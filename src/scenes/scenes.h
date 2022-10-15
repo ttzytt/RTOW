@@ -90,7 +90,7 @@ scene perlin_noise_sphere() {
 
 	const f4 asp_ratio = 3.0 / 2.0;
 	const int coeff = 1;
-	pt3 lookfrom(coeff * 13, coeff * 2, coeff * 3);
+	pt3 lookfrom(0, 0, 10);
 	pt3 lookat(0, 0, 0);
 	vec3 vup(0, 1, 0);
 	auto dist_to_focus = 10.0;
@@ -189,7 +189,7 @@ scene cornell_box() {
 	return scene(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
 };
 
-scene next_week_final(){
+scene next_week_final() {
 	hittable_list boxes1;
 	auto ground = make_shared<lambertian>(color(0.48, 0.83, 0.53));
 
@@ -204,8 +204,8 @@ scene next_week_final(){
 			auto y1 = rand_f8(1, 101);
 			auto z1 = z0 + w;
 
-			boxes1.add(make_shared<box>(pt3(x0, y0, z0), pt3(x1, y1, z1),
-										ground));
+			boxes1.add(
+				make_shared<box>(pt3(x0, y0, z0), pt3(x1, y1, z1), ground));
 		}
 	}
 
@@ -213,29 +213,41 @@ scene next_week_final(){
 
 	world.add(make_shared<bvh_node>(boxes1, 0, 1));
 
+	auto checker_text = make_shared<surface_checker>(
+		surface_checker::text_array{
+			make_shared<fixed_color>(color(0.2, 0.3, 0.1)),
+			make_shared<fixed_color>(color(0.9, 0.9, 0.9))},
+		std::pair<f8, f8>{16, 16});
+	auto checker_light = make_shared<diffuse_light>(checker_text);
+	
 	auto light = make_shared<diffuse_light>(color(7, 7, 7));
-	world.add(make_shared<rect_slice<1>>(123, 423, 147, 412, 554, light));
+	world.add(
+		make_shared<rect_slice<1>>(123, 423, 147, 412, 554, light));
 
 	auto center1 = pt3(400, 400, 200);
-	auto center2 = center1 + vec3(30, 0, 0);
-	auto moving_sphere_material = make_shared<lambertian>(color(0.7, 0.3, 0.1));
-	world.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50,
-										   moving_sphere_material));
+	auto center2 = center1 + vec3(40, 0, 0);
+	
 
+	auto moving_sphere_material =
+		make_shared<lambertian>(color(0.7, 0.3, 0.1) * 2);
+	world.add(make_shared<moving_sphere>(
+		center1, center2, 0, 1, 70, make_shared<lambertian>(checker_text)));
+	// world.add(make_shared<sphere>(center1, 50,
+	// 							  make_shared<lambertian>(checker_text)));
+	// world.add(make_shared<sphere>(center1, 50,
+	// 							  checker_light));
 	world.add(make_shared<sphere>(pt3(260, 150, 45), 50,
-									make_shared<dielectric>(1.5)));
-	world.add(
-		make_shared<sphere>(pt3(0, 150, 145), 50,
-							make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
+								  make_shared<dielectric>(1.5)));
+	world.add(make_shared<sphere>(
+		pt3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
 
 	auto boundary = make_shared<sphere>(pt3(360, 150, 145), 70,
 										make_shared<dielectric>(1.5));
 	world.add(boundary);
-	world.add(
-		make_shared<const_fog>(boundary, color(0.2, 0.4, 0.9), 0.5));
-		
-	boundary = make_shared<sphere>(pt3(0, 0, 0), 5000,
-								   make_shared<dielectric>(1.5));
+	world.add(make_shared<const_fog>(boundary, color(0.2, 0.4, 0.9), 0.5));
+
+	boundary =
+		make_shared<sphere>(pt3(0, 0, 0), 5000, make_shared<dielectric>(1.5));
 	world.add(make_shared<const_fog>(boundary, color(1, 1, 1), .0001));
 
 	auto emat = make_shared<lambertian>(
@@ -243,7 +255,7 @@ scene next_week_final(){
 	world.add(make_shared<sphere>(pt3(400, 200, 400), 100, emat));
 
 	auto terb = make_shared<terbulence>();
-	auto noise_text = make_shared<marblelike>(terb);
+	auto noise_text = make_shared<marblelike>(terb, 0.2);
 
 	world.add(make_shared<sphere>(pt3(220, 280, 300), 80,
 								  make_shared<lambertian>(noise_text)));
@@ -255,9 +267,10 @@ scene next_week_final(){
 		boxes2.add(make_shared<sphere>(pt3::rand(0, 165), 10, white));
 	}
 
-	world.add(make_shared<translate>(
-		make_shared<rotate_trans<1>>(make_shared<bvh_node>(boxes2, 0.0, 1.0), 15),
-		vec3(-100, 270, 395)));
+	world.add(
+		make_shared<translate>(make_shared<rotate_trans<1>>(
+								   make_shared<bvh_node>(boxes2, 0.0, 1.0), 15),
+							   vec3(-100, 270, 395)));
 
 	f8 asp_ratio = 1.0;
 	vec3 lookfrom = pt3(478, 278, -600);
