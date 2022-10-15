@@ -2,9 +2,9 @@
 #include <exception>
 #include <vector>
 
-#include "noise.h"
 #include "../rtow.h"
 #include "./interpo_mapers.h"
+#include "noise.h"
 
 f8 mx_ret = 0;
 
@@ -17,19 +17,21 @@ class terbulence : public noise {
 		for (int i = 0; i < cnt; i++) {
 			ret += wts[i] * (base->noise_coeff(freqs[i] * pt) * 2 - 1);
 		}
-		return fabs(ret) ;
+		return fabs(ret);
 		// 换成绝对值后，特别暗和特别亮的都是亮的
 		// 只有原来过渡的地方是暗的，感觉是把明暗交界的边描
 	}
 
-	terbulence(int _cnt = 6, shared_ptr<noise> _base = make_shared<perlin_noise<256>>()) : cnt(_cnt), base(_base) {
+	terbulence(int _cnt = 6,
+			   shared_ptr<noise> _base = make_shared<perlin_noise<256>>())
+		: cnt(_cnt), base(_base) {
 		wt_tot = pow(2, cnt);
 		f8 cur = 1;
 		// wts = 0.5, 0.25, 0.125 ...
 		freqs.resize(cnt), wts.resize(cnt);
 		for (int i = 0; i < cnt; i++) {
 			freqs[i] = cur;
-			wts[i] = pow(2, -cur);
+			wts[i] = pow(2, 1 - cur);
 			cur *= 2;
 		}
 	}

@@ -6,7 +6,7 @@
 #include "../textures/textures.h"
 #include "scene.h"
 
-scene rand_mul_sphere_mat() {
+scene weekend_final() {
 	hittable_list world;
 	// auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
 	// world.add(make_shared<sphere>(pt3(0, -1000, 0), 1000, ground_material));
@@ -188,3 +188,85 @@ scene cornell_box() {
 									   aperture, dist_to_focus, aperture, 1.0);
 	return scene(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
 };
+
+scene next_week_final(){
+	hittable_list boxes1;
+	auto ground = make_shared<lambertian>(color(0.48, 0.83, 0.53));
+
+	const int boxes_per_side = 20;
+	for (int i = 0; i < boxes_per_side; i++) {
+		for (int j = 0; j < boxes_per_side; j++) {
+			auto w = 100.0;
+			auto x0 = -1000.0 + i * w;
+			auto z0 = -1000.0 + j * w;
+			auto y0 = 0.0;
+			auto x1 = x0 + w;
+			auto y1 = rand_f8(1, 101);
+			auto z1 = z0 + w;
+
+			boxes1.add(make_shared<box>(pt3(x0, y0, z0), pt3(x1, y1, z1),
+										ground));
+		}
+	}
+
+	hittable_list world;
+
+	world.add(make_shared<bvh_node>(boxes1, 0, 1));
+
+	auto light = make_shared<diffuse_light>(color(7, 7, 7));
+	world.add(make_shared<rect_slice<1>>(123, 423, 147, 412, 554, light));
+
+	auto center1 = pt3(400, 400, 200);
+	auto center2 = center1 + vec3(30, 0, 0);
+	auto moving_sphere_material = make_shared<lambertian>(color(0.7, 0.3, 0.1));
+	world.add(make_shared<moving_sphere>(center1, center2, 0, 1, 50,
+										   moving_sphere_material));
+
+	world.add(make_shared<sphere>(pt3(260, 150, 45), 50,
+									make_shared<dielectric>(1.5)));
+	world.add(
+		make_shared<sphere>(pt3(0, 150, 145), 50,
+							make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
+
+	auto boundary = make_shared<sphere>(pt3(360, 150, 145), 70,
+										make_shared<dielectric>(1.5));
+	world.add(boundary);
+	world.add(
+		make_shared<const_fog>(boundary, color(0.2, 0.4, 0.9), 0.5));
+		
+	boundary = make_shared<sphere>(pt3(0, 0, 0), 5000,
+								   make_shared<dielectric>(1.5));
+	world.add(make_shared<const_fog>(boundary, color(1, 1, 1), .0001));
+
+	auto emat = make_shared<lambertian>(
+		make_shared<image_texture>("/mnt/e/prog/c++/RTOW/imgs/earthmap.jpg"));
+	world.add(make_shared<sphere>(pt3(400, 200, 400), 100, emat));
+
+	auto terb = make_shared<terbulence>();
+	auto noise_text = make_shared<marblelike>(terb);
+
+	world.add(make_shared<sphere>(pt3(220, 280, 300), 80,
+								  make_shared<lambertian>(noise_text)));
+
+	hittable_list boxes2;
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	int ns = 1000;
+	for (int j = 0; j < ns; j++) {
+		boxes2.add(make_shared<sphere>(pt3::rand(0, 165), 10, white));
+	}
+
+	world.add(make_shared<translate>(
+		make_shared<rotate_trans<1>>(make_shared<bvh_node>(boxes2, 0.0, 1.0), 15),
+		vec3(-100, 270, 395)));
+
+	f8 asp_ratio = 1.0;
+	vec3 lookfrom = pt3(478, 278, -600);
+	vec3 lookat = pt3(278, 278, 0);
+	f8 vfov = 40.0;
+	auto dist_to_focus = 10.0;
+	auto aperture = 0;
+	vec3 vup(0, 1, 0);
+	auto cam_ptr = make_shared<camera>(lookfrom, lookat, vup, vfov, asp_ratio,
+									   aperture, dist_to_focus, aperture, 1.0);
+	return scene(make_shared<bvh_node>(world), pure_black_back_ptr, cam_ptr);
+}

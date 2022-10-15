@@ -1,8 +1,6 @@
-#pragma once
-#include <array>
 #include <atomic>
-#include <list>
-#include <optional>
+#include <mutex>
+#include <stack>
 #include <thread>
 
 #include "backgrounds/backgrounds.h"
@@ -13,102 +11,140 @@
 #include "rtow.h"
 #include "scenes/scene.h"
 
-using color_map = std::vector<std::vector<color>>;
+class renderer {
+   public:
+	struct block2rend {
+		std::pair<int, int> col_range;
+		std::pair<int, int> row_range;	// [)
+	};
 
-// class render {
+	struct config {
+		std::pair<int, int> blksiz, picsiz;
+		const int sample_per_pix = 500, max_dep = 130,
+				  th_cnt = std::thread::hardware_concurrency();
+	};
 
-namespace render {
-struct block2rend {
-	std::pair<int, int> row_range;
-	std::pair<int, int> col_range;	// inclusive
-};
+	using color_map = std::vector<std::vector<color>>;
+	using job_stack = std::stack<block2rend>;
 
-struct config {
-	const int wid = 300, hei = 200, sample_per_pix = 500, max_dep = 130,
-			  th_cnt = std::thread::hardware_concurrency();
-};
+	renderer(const config& _conf) : conf(_conf) {}
 
-color ray_color(const ray& r, const hittable& world, const background& back,
-				int dep_left) {
-	if (dep_left <= 0) return color();
+	color ray_color(const ray& r, const hittable& world, const background& back,
+					int dep_left) {
+		if (dep_left <= 0) return color();
 
-	auto&& rec = world.hit(r, 0.00001, infinity);
-	if (!rec.has_value()) return back.value(r);	 // 如果没有撞到任何东西
+		auto&& rec = world.hit(r, 0.00001, infinity);
+		if (!rec.has_value()) return back.value(r);	 // 如果没有撞到任何东西
 
-	auto&& reflect_ret = rec->mat_ptr->ray_reflected(r, *rec);
+		auto&& reflect_ret = rec->mat_ptr->ray_reflected(r, *rec);
 
-	color emitted = rec->mat_ptr->emitted(rec->polar, rec->azim, rec->hit_pt);
-	if (!reflect_ret.has_value())  // 如果物体不反射
-		return emitted;
+		color emitted =
+			rec->mat_ptr->emitted(rec->polar, rec->azim, rec->hit_pt);
+		if (!reflect_ret.has_value())  // 如果物体不反射
+			return emitted;
 
-	auto& [r_ref, attenua] = *reflect_ret;
-	return emitted + attenua * ray_color(r_ref, world, back, dep_left - 1);
-}
-
-color_map out_color_map(scene sc, const config& conf) {
-	std::atomic<int> line_completed = 0;
-	int per_th = (conf.hei + conf.th_cnt - 1) / conf.th_cnt;
-	int hei_left = conf.hei;
-	color_map mp;
-	mp.resize(conf.hei);
-	for (int i = 0; i < conf.hei; i++) {
-		mp[i].resize(conf.wid);
+		auto& [r_ref, attenua] = *reflect_ret;
+		return emitted + attenua * ray_color(r_ref, world, back, dep_left - 1);
 	}
-	std::thread* ths[conf.th_cnt];
-	tqdm pbar;
 
-	std::thread bar_checker([&]() {	 // 检查进度
-		while (line_completed < conf.hei) {
-			pbar.progress(line_completed, conf.hei);
-			usleep(100 * 1000);	 // 100 毫秒
+	void split_rend_work() {
+		// 返回待渲染的块
+		std::pair<int, int>&blksiz = conf.blksiz, picsiz = conf.picsiz;
+		int lst_x = 0, lst_y = 0;
+		for (int j = std::min(blksiz.second, picsiz.second);
+			 j <= picsiz.second && lst_y != picsiz.second;
+			 j += std::min(blksiz.second, picsiz.second - j)) {
+			for (int i = std::min(blksiz.first, picsiz.first);
+				 i <= picsiz.first && lst_x != picsiz.first;
+				 i += std::min(blksiz.first, picsiz.first - i)) {
+				jobs.push({{lst_x, i}, {lst_y, j}});
+				lst_x = i;
+			}
+			lst_y = j;
+			lst_x = 0;
 		}
-	});
+		tot_blk = jobs.size();
+	}
 
-	for (int th = 1; th <= conf.th_cnt; th++) {
-		ths[th] = new std::thread(
-			[&](int sta_line, int th_id) {
-				for (int j = sta_line - 1; j >= std::max(sta_line - per_th, 0);
-					 j--) {
-					for (int i = 0; i < conf.wid; i++) {
-						color pixel(0, 0, 0);
-						if(j == 75 && i == 170){
-							std::cerr<<"on pt\n";
-						}
-
-						for (int k = 0; k < conf.sample_per_pix; k++) {
-							f8 x = (i + rand_f8()) / (conf.wid - 1);
-							f8 y = (j + rand_f8()) / (conf.hei - 1);
-							ray r = sc.cam->get_ray(x, y);
-							pixel +=
-								ray_color(r, *sc.world, *sc.back, conf.max_dep);
-						}
-						mp[j][i] = pixel / (f8)conf.sample_per_pix;
+	void rend_by_job(color_map& mp, const scene& sc) {
+		while (true) {
+			job_lock.lock();
+			if (jobs.empty()) {
+				job_lock.unlock();
+				return;
+			}
+			block2rend cur_blk = jobs.top();
+			jobs.pop();
+			job_lock.unlock();
+			auto [wid, hei] = conf.picsiz;
+			for (int i = cur_blk.col_range.first; i < cur_blk.col_range.second;
+				 i++) {
+				for (int j = cur_blk.row_range.first;
+					 j < cur_blk.row_range.second; j++) {
+					color pixel(0, 0, 0);
+					for (int k = 0; k < conf.sample_per_pix; k++) {
+						f8 x = (i + rand_f8()) / (wid - 1);
+						f8 y = (j + rand_f8()) / (hei - 1);
+						ray r = sc.cam->get_ray(x, y);
+						pixel +=
+							ray_color(r, *sc.world, *sc.back, conf.max_dep);
 					}
-					line_completed++;
+					mp[j][i] = pixel / (f8)conf.sample_per_pix;
 				}
-			},
-			hei_left, th);
-		hei_left -= per_th;
-	}
-
-	for (int i = 1; i <= conf.th_cnt; i++) {
-		ths[i]->join();
-		delete ths[i];
-	}
-	bar_checker.join();
-	pbar.finish();
-	return mp;
-}
-
-void out_ppm(const color_map& mp, std::ostream& out) {
-	out << "P3\n" << mp[0].size() << ' ' << mp.size() << "\n255\n";
-	// 长宽
-	for (int i = mp.size() - 1; i >= 0; i--) {
-		auto& line = mp[i];
-		for (auto& pix : line) {
-			write_color(out, pix);
+			}
+			blk_completed++;
 		}
 	}
-}
 
-}  // namespace render
+	color_map out_color_map(const scene& sc) {
+		color_map mp;
+		auto [wid, hei] = conf.picsiz;
+		mp.resize(hei);
+		for (int i = 0; i < hei; i++) mp[i].resize(wid);
+
+		split_rend_work();
+		std::thread bar_checker([&]() {	 // 检查进度
+			while (blk_completed < tot_blk) {
+				pbar.progress(blk_completed, tot_blk);
+				usleep(100 * 1000);	 // 100 毫秒
+			}
+		});
+
+		std::thread* ths[conf.th_cnt];
+		for (int th = 0; th < conf.th_cnt; th++) {
+			ths[th] = new std::thread(&renderer::rend_by_job, this,
+									  std::ref(mp), std::ref(sc));
+		}
+
+		for (int i = 0; i < conf.th_cnt; i++) {
+			ths[i]->join();
+			delete ths[i];
+		}
+		bar_checker.join();
+		pbar.finish();
+		return mp;
+	}
+	void out_ppm(std::ostream& out, const color_map& mp) {
+		out << "P3\n" << mp[0].size() << ' ' << mp.size() << "\n255\n";
+		// 长宽
+		for (int i = mp.size() - 1; i >= 0; i--) {
+			auto& line = mp[i];
+			for (auto& pix : line) {
+				write_color(out, pix);
+			}
+		}
+	}
+
+	void out_ppm(std::ostream& out, const scene& sc) {
+		out_ppm(out, out_color_map(sc));
+	}
+
+	config conf;
+
+   private:
+	std::mutex job_lock;
+	job_stack jobs;
+	tqdm pbar;
+	int tot_blk;
+	std::atomic<int> blk_completed;
+};

@@ -15,13 +15,13 @@
 class const_fog : public hittable {
    public:
 	const_fog(shared_ptr<hittable> bound, shared_ptr<material> _parti_mat,
-			  f8 _passing_prob = 0.5, f8 particle_p_unit = 0.01145)
+			  f8 particle_p_unit = 0.01145, f8 _passing_prob = 0.368)
 		: boundary(bound),
 		  parti_mat(_parti_mat),
 		  passing_prob(_passing_prob),
 		  inv_dens(1.0 / particle_p_unit) {}
-	const_fog(shared_ptr<hittable> bound, color c, f8 _passing_prob = 0.5,
-			  f8 particle_p_unit = 0.01145)
+	const_fog(shared_ptr<hittable> bound, color c, 
+			  f8 particle_p_unit = 0.01145, f8 _passing_prob = 0.368)
 		: boundary(bound),
 		  parti_mat(make_shared<isotropic>(c)),
 		  passing_prob(_passing_prob),
@@ -60,6 +60,7 @@ std::optional<hit_rec> const_fog::hit(const ray& r, f8 t_min, f8 t_max) const {
 
 	hit_rec ret = *rec_in;
 	ret.t = rec_in->t + hit_dis / ray_len;
+	if(ret.t > t_max || ret.t < t_min) return std::nullopt;
 	ret.hit_pt = r.at(ret.t);
 
 	ret.norm = rand_unit_vec();

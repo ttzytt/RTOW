@@ -26,7 +26,8 @@ class dielectric : public material {
 		f8 sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 		bool cannot_refract = ref_ratio * sin_theta > 1.0;
 		vec3 out_dir;
-		if (cannot_refract)
+
+		if (cannot_refract || reflectance(cos_theta, ref_ratio) > rand_f8())
 			out_dir = reflect(unit_dir, rec.norm);
 		else
 			out_dir = refract(unit_dir, rec.norm, ref_ratio);
@@ -34,6 +35,12 @@ class dielectric : public material {
 		ray r_out(rec.hit_pt, out_dir, r_in.tm);
 		color ret_alb = albedo->value(rec.polar, rec.azim, rec.hit_pt);
 		return std::make_pair(r_out, ret_alb);
+	}
+
+	static f8 reflectance(f8 cos_the, f8 ref_idx){
+		f8 r0 = (1 - ref_idx) / (1 + ref_idx);
+		r0 = r0 * r0;
+		return r0 + (1 - r0) * pow((1 - cos_the), 5);
 	}
 
 	f8 ref_idx, fuzz;  // 折射率

@@ -21,18 +21,19 @@ int main(int argc, char* argv[]) {
 
 	// img
 	const f4 asp_ratio = 1;
-	const int wid = 200;
+	const int wid = 400;
 	int mx_th = std::thread::hardware_concurrency();
-	render::config conf{
-		.wid = wid,
-		.hei = round((f8)wid / asp_ratio),
+	renderer::config conf{
+		.blksiz = {10, 10},
+		.picsiz = {wid, ((f8)wid / asp_ratio)},
 		.sample_per_pix = 250,
 		.max_dep = 120,
-		.th_cnt = 1,
+		.th_cnt = mx_th,
 	};
-	
+	renderer rd(conf);
+
 	auto start_tm = chrono::steady_clock::now();
-	cornell_box().out_ppm(outfile, conf);
+	rd.out_ppm(outfile, next_week_final());
 	auto end_tm = chrono::steady_clock::now();
 
 	auto duration_mili =
